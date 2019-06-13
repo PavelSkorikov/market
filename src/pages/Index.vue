@@ -1,14 +1,13 @@
 <template>
       <div class="row">
         <div class="col-2">
-            <q-list dense style="min-width: 100px">
+            <q-list dense style="min-width: 100px" bordered separator>
               <q-item clickable v-close-popup>
-                <q-item-section>Open...</q-item-section>
+                <q-item-section>Open</q-item-section>
               </q-item>
               <q-item clickable v-close-popup>
                 <q-item-section>New</q-item-section>
               </q-item>
-              <q-separator />
               <q-item clickable>
                 <q-item-section>Preferences</q-item-section>
                 <q-item-section side>
@@ -44,7 +43,7 @@
                 </q-menu>
 
               </q-item>
-              <q-separator />
+
               <q-item clickable v-close-popup>
                 <q-item-section>Quit</q-item-section>
               </q-item>

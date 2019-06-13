@@ -6,9 +6,10 @@
         <div class="col-2"></div>
         <div class="col-8">
       <q-toolbar>
-        <q-toolbar-title>
-
-        </q-toolbar-title>
+          <q-avatar>
+            <img src="/assets/logo-market.png">
+          </q-avatar>
+        <q-toolbar-title>Online Магазин</q-toolbar-title>
         <q-btn flat style="color: white" label="Регистрация" />
         <q-btn flat style="color: orange" label="Вход" />
       </q-toolbar>
@@ -24,15 +25,21 @@
               <q-icon color="primary" name="catalog" />
               <q-route-tab to="/page2" icon="menu" label="Каталог" />
               <span style="color: #21BA45">eweqe</span>
-              <q-input outlined bg-color="white" v-model="text" :dense="dense">
+              <q-input outlined bg-color="white" v-model="text" :dense="dense" placeholder="Поиск товара">
                 <template v-slot:append>
                   <q-icon color="primary" name="search"/>
                 </template>
               </q-input>
-              <q-route-tab to="/page3" label="Оплата"/>
-              <q-route-tab to="/page3" label="Доставка"/>
-              <q-tab name="mails" icon="basket" label="Mails">
-                <q-badge color="orange" floating>2</q-badge>
+              <q-route-tab to="/page3" icon="money" label="Оплата"/>
+              <q-route-tab to="/page3" icon="local_shipping" label="Доставка"/>
+              <q-tab name="equalizer" icon="equalizer" label="Сравнение">
+                <q-badge color="orange" floating>0</q-badge>
+              </q-tab>
+              <q-tab name="favorite" icon="favorite" label="Избранное">
+                <q-badge color="orange" floating>0</q-badge>
+              </q-tab>
+              <q-tab name="basket" icon="shopping_cart" label="Корзина">
+                <q-badge color="orange" floating>0</q-badge>
               </q-tab>
             </q-tabs>
         </div>
