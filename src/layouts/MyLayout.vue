@@ -23,7 +23,7 @@
         <div class="col-8">
             <q-tabs align="left" class="bg-positive" text-color="white">
               <q-icon color="primary" name="catalog" />
-              <q-route-tab to="/page2" icon="menu" label="Каталог" />
+              <q-route-tab to="/catalog" icon="menu" label="Каталог" />
               <span style="color: #21BA45">eweqe</span>
               <q-input outlined bg-color="white" v-model="text" :dense="dense" placeholder="Поиск товара">
                 <template v-slot:append>
@@ -49,15 +49,18 @@
 
     <div class="row">
       <div class="col-2"></div>
-      <div class="col-8">
+      <div class="col-2">
         <q-page-container>
-          <router-view />
+          <router-view name="menu" />
+        </q-page-container>
+      </div>
+      <div class="col-6">
+        <q-page-container>
+          <router-view name="content" />
         </q-page-container>
       </div>
       <div class="col-2"></div>
     </div>
-
-
 
     <q-footer reveal elevated class="bg-grey-8 text-white">
       <q-toolbar>

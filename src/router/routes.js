@@ -1,12 +1,15 @@
+import Content from 'pages/content.vue'
+import Menu from 'pages/menu.vue'
 
 const routes = [
   {
     path: '/',
     component: () => import('layouts/MyLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/Index.vue') }
+      { path: '', components: {content: Content,
+                               menu: Menu}}
     ]
-  }
+    }
 ]
 
 // Always leave this as last one
