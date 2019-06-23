@@ -1,8 +1,9 @@
 <template>
   <div class="q-pa-md">
     <div class="q-pa-md" style="max-width: 400px">
-      <q-form>
+      <q-form  class="q-gutter-md">
         <q-input
+          square
           filled
           v-model="name"
           label="Название компании"
@@ -10,10 +11,11 @@
           :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']"
         />
         <q-input
+          type = 'textarea'
+          square
+          outlined
           v-model="description"
           label="Описание"
-          lazy-rules
-          :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']"
         />
 
         <div>
