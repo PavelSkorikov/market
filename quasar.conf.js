@@ -51,12 +51,14 @@ module.exports = function (ctx) {
         'QTree',
         'QAvatar',
         'QInput',
-        'QBadge'
+        'QBadge',
+        'QForm'
       ],
 
       directives: [
         'Ripple',
-        'ClosePopup'
+        'ClosePopup',
+        'GoBack'
       ],
 
       // Quasar plugins
@@ -72,7 +74,7 @@ module.exports = function (ctx) {
 
     build: {
       scopeHoisting: true,
-      // vueRouterMode: 'history',
+      vueRouterMode: 'history',
       // vueCompiler: true,
       // gzip: true,
       // analyze: true,

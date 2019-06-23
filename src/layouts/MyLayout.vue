@@ -6,10 +6,11 @@
         <div class="col-2"></div>
         <div class="col-8">
       <q-toolbar>
-          <q-avatar>
+          <q-avatar v-go-back=" '/' " style="cursor: pointer">
             <img src="/assets/logo-market.png">
           </q-avatar>
-        <q-toolbar-title>Online Магазин</q-toolbar-title>
+        <q-toolbar-title v-go-back=" '/' " style="cursor: pointer">Online Магазин</q-toolbar-title>
+        <q-btn to="/admin" flat style="color: white" label="Админ" />
         <q-btn flat style="color: white" label="Регистрация" />
         <q-btn flat style="color: orange" label="Вход" />
       </q-toolbar>
@@ -24,14 +25,14 @@
             <q-tabs align="left" class="bg-positive" text-color="white">
               <q-icon color="primary" name="catalog" />
               <q-route-tab to="/catalog" icon="menu" label="Каталог" />
-              <span style="color: #21BA45">eweqe</span>
+              <span style="color: #21BA45">eweqedsf</span>
               <q-input outlined bg-color="white" v-model="text" :dense="dense" placeholder="Поиск товара">
                 <template v-slot:append>
                   <q-icon color="primary" name="search"/>
                 </template>
               </q-input>
-              <q-route-tab to="/page3" icon="money" label="Оплата"/>
-              <q-route-tab to="/page3" icon="local_shipping" label="Доставка"/>
+              <q-route-tab to="/oplata" icon="money" label="Оплата"/>
+              <q-route-tab to="/dostavka" icon="local_shipping" label="Доставка"/>
               <q-tab name="equalizer" icon="equalizer" label="Сравнение">
                 <q-badge color="orange" floating>0</q-badge>
               </q-tab>
@@ -51,7 +52,7 @@
       <div class="col-2"></div>
       <div class="col-2">
         <q-page-container>
-          <router-view name="menu" />
+          <Menu></Menu>
         </q-page-container>
       </div>
       <div class="col-6">
@@ -74,13 +75,16 @@
 </template>
 
 <script>
+  import Menu from "../components/menu";
   export default {
+    components: {Menu},
     data () {
       return {
         text: '',
         dense: true
       }
     }
+
   }
 </script>
 
