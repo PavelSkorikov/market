@@ -50,6 +50,7 @@ export default {
 
   methods: {
     onSubmit () {
+
       this.$q.notify({
         color: 'green-4',
         textColor: 'white',
@@ -59,6 +60,7 @@ export default {
     },
     onReset () {
       this.name = null;
+      this.parent_name = null;
       this.description = null;
     }
   }

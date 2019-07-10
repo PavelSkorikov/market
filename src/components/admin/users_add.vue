@@ -38,10 +38,9 @@
       </q-form>
     </div>
       <div>
-
           <q-btn @click="onSubmit" label="Добавить" type="submit" color="primary"/>
           <q-btn @click="onReset" label="Сброс" type="reset" color="primary" flat class="q-ml-sm" />
-  </div>
+      </div>
   </div>
 </template>
 
@@ -55,7 +54,6 @@ export default {
     return {
       password: '',
       isPwd: true,
-
       email: '',
       discount: '',
     }

@@ -28,10 +28,8 @@
   </div>
 </template>
 
-<style>
-</style>
-
 <script>
+  import axios from 'axios';
 export default {
   name: 'Companies_add',
   data () {
@@ -43,17 +41,31 @@ export default {
 
   methods: {
     onSubmit () {
+      axios.post('http://127.0.0.1:3000/addCompany', {
+        name: this.name,
+        description: this.description
+      }).then((res) => {
+        console.log('Ответ сервера:', res);
         this.$q.notify({
           color: 'green-4',
           textColor: 'white',
           icon: 'fas fa-check-circle',
           message: 'Отправлено'
+        });
+        this.name = null;
+        this.description = null;
+      })
+        .catch(function (err) {
+          console.log('err', err)
         })
-    },
+    }
+  },
     onReset () {
       this.name = null;
       this.description = null;
     }
-  }
 }
 </script>
+
+<style>
+</style>
