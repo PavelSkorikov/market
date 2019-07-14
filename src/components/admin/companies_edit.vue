@@ -41,8 +41,8 @@ export default {
   methods: {
     onSubmit() {
       axios.post('http://127.0.0.1:3000/addCompany', {
-          name: this.name,
-          description: this.description
+        name: this.name,
+        description: this.description
       }).then((res) => {
         console.log('Ответ сервера:', res);
         if (res.status == 200) {
