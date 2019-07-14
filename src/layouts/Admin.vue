@@ -35,54 +35,17 @@
                   </q-list>
                 </q-menu>
               </q-tab>
-              <q-tab name="products" @click="showing_products = true" icon="category" label="Товары">
+              <q-route-tab to="/admin/products" icon="category" label="Товары">
                 <q-badge color="orange" floating>0</q-badge>
-                <q-menu v-model="showing_products"
-                        transition-show="flip-right"
-                        transition-hide="flip-left">
-                  <q-list style="min-width: 100px">
-                    <q-item clickable v-close-popup to="/admin/products_add">
-                      <q-item-section>Добавить</q-item-section>
-                    </q-item>
-                    <q-separator />
-                    <q-item clickable v-close-popup to="/admin/products">
-                      <q-item-section>Список</q-item-section>
-                    </q-item>
-                  </q-list>
-                </q-menu>
+              </q-route-tab>
               </q-tab>
-              <q-tab name="categories" @click="showing_categories = true" icon="format_align_left" label="Категории">
+              <q-route-tab to="/admin/categories" icon="format_align_left" label="Категории">
                 <q-badge color="orange" floating>0</q-badge>
-                <q-menu v-model="showing_categories"
-                        transition-show="flip-right"
-                        transition-hide="flip-left">
-                  <q-list style="min-width: 100px">
-                    <q-item clickable v-close-popup to="/admin/categories_add">
-                      <q-item-section>Добавить</q-item-section>
-                    </q-item>
-                    <q-separator />
-                    <q-item clickable v-close-popup to="/admin/categories">
-                      <q-item-section>Список</q-item-section>
-                    </q-item>
-                  </q-list>
-                </q-menu>
+              </q-route-tab>
               </q-tab>
-              <q-tab name="companies" @click="showing_companies = true" icon="domain" label="Компании">
+              <q-route-tab to="/admin/companies" icon="domain" label="Компании">
                 <q-badge color="orange" floating>0</q-badge>
-                <q-menu v-model="showing_companies"
-                        transition-show="flip-right"
-                        transition-hide="flip-left">
-                  <q-list style="min-width: 100px">
-                    <q-item clickable v-close-popup to="/admin/companies_add">
-                      <q-item-section @click="">Добавить</q-item-section>
-                    </q-item>
-                    <q-separator />
-                    <q-item clickable v-close-popup to="/admin/companies">
-                      <q-item-section>Список</q-item-section>
-                    </q-item>
-                  </q-list>
-                </q-menu>
-              </q-tab>
+              </q-route-tab>
               <q-route-tab name="orders" to="/admin/orders" icon="shop" label="Заказы">
                 <q-badge color="orange" floating>0</q-badge>
               </q-route-tab>
