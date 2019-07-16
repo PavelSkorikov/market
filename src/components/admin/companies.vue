@@ -9,11 +9,12 @@
     <!-- companies list -->
     <q-list bordered separator>
       <q-item v-for="company in companies" :key="company.id" clickable v-ripple>
-        <q-item-section @click="name=company.name, description=company.description, form_edit=true"> {{company.name}}
+        <q-item-section @click="companyData=company, form_edit=true">
+          {{company.name}}
         </q-item-section>
         <q-item-section top side>
           <div class="text-grey-8 q-gutter-xs">
-            <q-btn @click="dialog_delete = true, item = company" class="gt-xs" size="12px"
+            <q-btn @click="dialog_delete = true, companyData = company" class="gt-xs" size="12px"
                    flat
                    dense round
                    icon="delete" />
@@ -26,12 +27,12 @@
     <q-dialog v-model="dialog_delete" persistent>
       <q-card>
         <q-card-section class="row items-center">
-          <span class="q-ml-sm">Вы уверены, что хотите удалить компанию {{item.name}}?</span>
+          <span class="q-ml-sm">Вы уверены, что хотите удалить компанию {{companyData.name}}?</span>
         </q-card-section>
         <!-- Notice v-close-popup -->
         <q-card-actions align="right">
           <q-btn flat label="Нет" color="primary" v-close-popup />
-          <q-btn flat label="Да" color="primary"  @click="del(item.id)" v-close-popup />
+          <q-btn flat label="Да" color="primary"  @click="del" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -49,7 +50,7 @@
             <q-input
               square
               filled
-              v-model="name"
+              v-model="companyData.name"
               label="Название компании"
               lazy-rules
               :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']"
@@ -58,7 +59,7 @@
               type = 'textarea'
               square
               outlined
-              v-model="description"
+              v-model="companyData.description"
               label="Описание"
             />
             <div>
@@ -84,7 +85,7 @@
             <q-input
               square
               filled
-              v-model="name"
+              v-model="companyData.name"
               label="Название компании"
               lazy-rules
               :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']"
@@ -93,7 +94,7 @@
               type = 'textarea'
               square
               outlined
-              v-model="description"
+              v-model="companyData.description"
               label="Описание"
             />
             <div>
@@ -116,13 +117,11 @@
   name: 'Companies',
   data() {
     return {
-      item: {},
+      companyData: {},
       companies: null,
       dialog_delete: false,
       form_add: false,
       form_edit: false,
-      name: null,
-      description: null,
     }
   },
     //при открытии компонента загружаем с сервера список Компаний
@@ -139,11 +138,11 @@
         .then(response => (this.companies = response.data));
     },
     //метод - удаление компании
-    del(company) {
+    del() {
           axios
           .delete('http://127.0.0.1:3000/delCompany', {
             params: {
-              id: company
+              id: this.companyData.id
             }
           }).then((res) => {
           console.log('Ответ сервера:', res);
@@ -151,13 +150,14 @@
         }).catch(function (err) {
           alert('Удалить не получилось');
         })
+      this.companyData = {};
     },
     // метод добавления компании
     add() {
-      if(this.name) {
+      if(this.companyData.name) {
         axios.post('http://127.0.0.1:3000/addCompany', {
-          name: this.name,
-          description: this.description
+          name: this.companyData.name,
+          description: this.companyData.description
         }).then((res) => {
           console.log('Ответ сервера:', res);
           if (res.status == 200) {
@@ -168,24 +168,43 @@
               message: 'Отправлено'
             });
             this.get_companies();
-            this.name = null;
-            this.description = null;
           }
         })
           .catch(function (err) {
             alert('Ошибка - объект не добавлен');
           })
       }
+      this.companyData = {};
     },
     edit() {
-      if(this.name) {
-        axios.put()
+      if(this.companyData.name) {
+        console.log(this.companyData.id);
+        axios
+          .put('http://127.0.0.1:3000/putCompany', {
+              id: this.companyData.id,
+              name: this.companyData.name,
+              description: this.companyData.description
+          }).then((res)=> {
+              console.log('Ответ сервера:', res);
+              if (res.status == 204) {
+                this.$q.notify({
+                  color: 'green-4',
+                  textColor: 'white',
+                  icon: 'fas fa-check-circle',
+                  message: 'Отправлено'
+                });
+              }
+              this.get_companies();
+          })
+          .catch(function (err) {
+            alert('Ошибка - объект не изменен');
+          })
+        }
       }
-    }
-
 
     }
-  }
+
+    }
 </script>
 <style>
 </style>
