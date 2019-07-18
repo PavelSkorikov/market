@@ -43,7 +43,7 @@
         <q-bar  class="bg-positive text-white">
           <div>Добавить новую компанию</div>
           <q-space />
-          <q-btn dense flat icon="close" v-close-popup></q-btn>
+          <q-btn dense flat icon="close" @click="companyData={}" v-close-popup></q-btn>
         </q-bar>
         <q-card-section class="row items-center">
           <q-form  class="q-gutter-md">
@@ -78,7 +78,7 @@
         <q-bar  class="bg-positive text-white">
           <div>Редактировать компанию</div>
           <q-space />
-          <q-btn dense flat icon="close" v-close-popup></q-btn>
+          <q-btn dense flat icon="close" @click="companyData={}" v-close-popup ></q-btn>
         </q-bar>
         <q-card-section class="row items-center">
           <q-form  class="q-gutter-md">
@@ -99,8 +99,6 @@
             />
             <div>
               <q-btn @click="edit" label="Изменить" type="submit" color="primary"/>
-              <q-btn @click="name = null, description = null" label="Сброс" type="reset" color="primary" flat
-                     class="q-ml-sm" />
             </div>
           </q-form>
         </q-card-section>
@@ -127,20 +125,20 @@
     //при открытии компонента загружаем с сервера список Компаний
   mounted() {
     axios
-    .get('http://127.0.0.1:3000/getCompany')
+    .get(this.appConfig.api_url+'/getCompany')
       .then(response => (this.companies = response.data));
   },
   methods: {
     //метод получения списка компаний от сервера
     get_companies() {
       axios
-        .get('http://127.0.0.1:3000/getCompany')
+        .get(this.appConfig.api_url+'/getCompany')
         .then(response => (this.companies = response.data));
     },
     //метод - удаление компании
     del() {
           axios
-          .delete('http://127.0.0.1:3000/delCompany', {
+          .delete(this.appConfig.api_url+'/delCompany', {
             params: {
               id: this.companyData.id
             }
@@ -155,7 +153,7 @@
     // метод добавления компании
     add() {
       if(this.companyData.name) {
-        axios.post('http://127.0.0.1:3000/addCompany', {
+        axios.post(this.appConfig.api_url+'/addCompany', {
           name: this.companyData.name,
           description: this.companyData.description
         }).then((res) => {
@@ -165,7 +163,7 @@
               color: 'green-4',
               textColor: 'white',
               icon: 'fas fa-check-circle',
-              message: 'Отправлено'
+              message: 'Добавлено'
             });
             this.get_companies();
           }
@@ -180,7 +178,7 @@
       if(this.companyData.name) {
         console.log(this.companyData.id);
         axios
-          .put('http://127.0.0.1:3000/putCompany', {
+          .put(this.appConfig.api_url+'/putCompany', {
               id: this.companyData.id,
               name: this.companyData.name,
               description: this.companyData.description
@@ -191,7 +189,7 @@
                   color: 'green-4',
                   textColor: 'white',
                   icon: 'fas fa-check-circle',
-                  message: 'Отправлено'
+                  message: 'Изменено'
                 });
               }
               this.get_companies();
@@ -200,6 +198,7 @@
             alert('Ошибка - объект не изменен');
           })
         }
+      this.companyData = {};
       }
 
     }
