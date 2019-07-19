@@ -39,7 +39,7 @@
 
   <!-- form for create company-->
     <q-dialog v-model="form_add">
-      <q-card>
+      <q-card style="min-width: 400px">
         <q-bar  class="bg-positive text-white">
           <div>Добавить новую компанию</div>
           <q-space />
@@ -54,6 +54,7 @@
               label="Название компании"
               lazy-rules
               :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']"
+              style="min-width: 370px"
             />
             <q-input
               type = 'textarea'
@@ -74,7 +75,7 @@
 
     <!-- form for edit company -->
     <q-dialog v-model="form_edit">
-      <q-card>
+      <q-card style="min-width: 400px">
         <q-bar  class="bg-positive text-white">
           <div>Редактировать компанию</div>
           <q-space />
@@ -89,6 +90,7 @@
               label="Название компании"
               lazy-rules
               :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']"
+              style="min-width: 370px"
             />
             <q-input
               type = 'textarea'
@@ -130,7 +132,7 @@
   },
   methods: {
     //метод получения списка компаний от сервера
-    get_companies() {
+    get_categories() {
       axios
         .get(this.appConfig.api_url+'/getCompany')
         .then(response => (this.companies = response.data));
@@ -144,7 +146,7 @@
             }
           }).then((res) => {
           console.log('Ответ сервера:', res);
-          if (res.status == 204) this.get_companies();
+          if (res.status == 204) this.get_categories();
         }).catch(function (err) {
           alert('Удалить не получилось');
         })
@@ -165,7 +167,7 @@
               icon: 'fas fa-check-circle',
               message: 'Добавлено'
             });
-            this.get_companies();
+            this.get_categories();
           }
         })
           .catch(function (err) {
@@ -192,7 +194,7 @@
                   message: 'Изменено'
                 });
               }
-              this.get_companies();
+              this.get_categories();
           })
           .catch(function (err) {
             alert('Ошибка - объект не изменен');
