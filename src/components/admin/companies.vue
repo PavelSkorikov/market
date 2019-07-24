@@ -201,6 +201,7 @@
           })
         }
       this.companyData = {};
+      this.form_edit = false;
       }
 
     }

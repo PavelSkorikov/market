@@ -6,7 +6,7 @@
       <q-btn @click="form_add = true" label="Добавить" outline color="white" />
     </q-toolbar>
 
-    <!-- categories list -->
+    <!-- categories tree -->
     <q-tree
       :nodes="category_tree"
       node-key="label"
@@ -57,7 +57,7 @@
             />
             <div>
               <q-btn @click="add" label="Добавить" type="submit" color="primary"/>
-              <q-btn @click="name = null, description = null" label="Сброс" type="reset" color="primary" flat
+              <q-btn @click="categoryData = {}" label="Сброс" type="reset" color="primary" flat
                      class="q-ml-sm" />
             </div>
           </q-form>
@@ -117,20 +117,21 @@
         categories: null,
         dialog_delete: false,
         form_add: false,
-        form_edit: false
+        form_edit: false,
       }
     },
     //with open a component load list categories from server
-    beforeCreate() {
+    mounted() {
       axios
         .get(this.appConfig.api_url + '/getCategory')
         .then(response => (this.categories = response.data));
     },
     watch: {
       selected: function (newSelected) {
-        this.categoryData.name = newSelected;
         for(let category of this.categories){
           if(category.name == newSelected){
+            this.categoryData.name = newSelected;
+            this.categoryData.parent_name = category.parent_name;
             this.categoryData.description = category.description;
             this.categoryData.id = category.id;
             break;
@@ -140,7 +141,7 @@
       }
     },
     computed: {
-      //computed a list of categories names for form "add category"
+      //computed a list of categories names for forms "add category" and "edit category"
       category_names: function () {
         if (this.categories) {
           let names = [];
@@ -150,7 +151,7 @@
           return names;
         }
       },
-      //computed a list of tree categories for visualization in page
+      //computed a tree of categories for visualization in page
       category_tree: function () {
         if (this.categories) {
           let tree = [];
@@ -175,9 +176,8 @@
                 });
                 i += 1;
                 return;
-              } else {
-                if (item.children) find_parent(elem, item.children);
               }
+              if(item.children.length > 0) find_parent(elem, item.children);
             }
           }
           // for each category from categories create element tree categories
@@ -214,6 +214,7 @@
               alert('Удалить не получилось');
             })
             this.categoryData = {};
+            this.form_edit = false;
           },
           // method - create category
           add() {
@@ -243,10 +244,6 @@
           // method - edit category
           edit() {
             if (this.categoryData.name) {
-              console.log(this.categoryData.name);
-              console.log(this.categoryData.description);
-              console.log(this.categoryData.parent_name);
-              console.log(this.categoryData.id);
               axios
                 .put(this.appConfig.api_url + '/putCategory', {
                   id: this.categoryData.id,
@@ -269,7 +266,6 @@
                   alert('Ошибка - объект не изменен');
                 })
             }
-            this.categoryData = {};
           }
         }
       }
