@@ -6,22 +6,14 @@
       <q-btn @click="form_add = true" label="Добавить" outline color="white" />
     </q-toolbar>
 
-    <!-- companies list -->
-    <q-list bordered separator>
-      <q-item v-for="product in products" :key="product.id" clickable v-ripple>
-        <q-item-section @click="productData=product, form_edit=true">
-          {{product.name}}
-        </q-item-section>
-        <q-item-section top side>
-          <div class="text-grey-8 q-gutter-xs">
-            <q-btn @click="dialog_delete = true, productData = product" class="gt-xs" size="12px"
-                   flat
-                   dense round
-                   icon="delete" />
-          </div>
-        </q-item-section>
-      </q-item>
-    </q-list>
+    <!-- products table -->
+    <q-table
+      :data="data_products"
+      :columns="columns_products"
+      row-key="name"
+      :pagination.sync="pagination"
+      hide-bottom
+    />
 
     <!-- dialog for delete submit -->
     <q-dialog v-model="dialog_delete" persistent>
@@ -154,6 +146,34 @@
         dialog_delete: false,
         form_add: false,
         form_edit: false,
+        columns_products: [
+          {
+            name: 'name',
+            required: true,
+            label: 'Наименование',
+            align: 'left',
+            field: row => row.name,
+            sortable: true
+          },
+          { name: 'model', align: 'left', label: 'Модель', field: 'model' },
+          { name: 'price', label: 'Цена(руб.)', field: 'price', sortable: true },
+          { name: 'count', label: 'Количество(шт.)', field: 'count', sortable: true },
+          { name: 'availability', label: 'Доступность', field: 'availability', sortable: true  }
+        ],
+        pagination: {
+          sortBy: 'name',
+          descending: false,
+          page: 1,
+          rowsPerPage: 10
+          // rowsNumber: xx if getting data from a server
+        },
+      }
+    },
+    computed: {
+      data_products: function() {
+        if(this.products){
+          return this.products;
+        }
       }
     },
     //при открытии компонента загружаем с сервера список Компаний
@@ -187,17 +207,18 @@
       // метод добавления компании
       add() {
         if(this.productData.name) {
-          axios.post(this.appConfig.api_url+'/addProduct', this.productData)
-            .then((res) => {
+          axios.post(this.appConfig.api_url+'/addProduct',
+            this.productData
+          ).then((res) => {
             console.log('Ответ сервера:', res);
-            if (res.status == 200) {
+            if(res.status == 200) {
               this.$q.notify({
                 color: 'green-4',
                 textColor: 'white',
                 icon: 'fas fa-check-circle',
                 message: 'Добавлено'
               });
-              this.get_categories();
+              this.get_products();
             }
           })
             .catch(function (err) {
