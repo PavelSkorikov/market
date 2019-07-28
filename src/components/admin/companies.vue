@@ -132,7 +132,7 @@
   },
   methods: {
     //метод получения списка компаний от сервера
-    get_categories() {
+    get_companies() {
       axios
         .get(this.appConfig.api_url+'/getCompany')
         .then(response => (this.companies = response.data));
@@ -146,7 +146,7 @@
             }
           }).then((res) => {
           console.log('Ответ сервера:', res);
-          if (res.status == 204) this.get_categories();
+          if (res.status == 204) this.get_companies();
         }).catch(function (err) {
           alert('Удалить не получилось');
         })
@@ -167,7 +167,7 @@
               icon: 'fas fa-check-circle',
               message: 'Добавлено'
             });
-            this.get_categories();
+            this.get_companies();
           }
         })
           .catch(function (err) {
@@ -194,7 +194,7 @@
                   message: 'Изменено'
                 });
               }
-              this.get_categories();
+              this.get_companies();
           })
           .catch(function (err) {
             alert('Ошибка - объект не изменен');

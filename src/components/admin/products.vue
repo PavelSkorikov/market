@@ -10,6 +10,7 @@
       </q-input>
       <q-space />
       <q-btn flat @click="form_add = true" label="Добавить" outline color="white" />
+      <q-btn flat @click="edit_select" label="Изменить" outline color="white" />
       <div class="text-white q-gutter-xs">
         <q-btn @click="dialog_delete = true" class="gt-xs" size="12px"
                flat
@@ -20,6 +21,7 @@
 
     <!-- products table -->
     <q-table
+      class="my-sticky-header-table"
       :data="data_products"
       :columns="columns_products"
       row-key="name"
@@ -75,6 +77,8 @@
               v-model="productData.description"
               label="Описание"
             />
+            <q-select v-model="productData.CategoryId" :options="category_names" label="категория" />
+            <q-select v-model="productData.CompanyId" :options="company_names" label="компания" />
             <q-input
               filled
               v-model="productData.price"
@@ -84,6 +88,8 @@
               reverse-fill-mask
               input-class="text-right"
               label="Цена"
+              lazy-rules
+              :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']"
             />
             <q-input
               filled
@@ -157,6 +163,8 @@
       return {
         productData: {},
         products: null,
+        categories: null,
+        companies: null,
         dialog_delete: false,
         form_add: false,
         form_edit: false,
@@ -180,12 +188,13 @@
           sortBy: 'name',
           descending: false,
           page: 1,
-          rowsPerPage: 10
+          rowsPerPage: 0
           // rowsNumber: xx if getting data from a server
         },
       }
     },
     computed: {
+      //фильтруем список товаров по заданному слову из строки поиска
       data_products: function() {
         if(this.products){
           if(!this.search_text) return this.products;
@@ -200,13 +209,39 @@
             return data;
           }
         }
-      }
+      },
+      //получаем список имен категорий для форм добавления и изменения товара
+      category_names: function () {
+        if (this.categories) {
+          let names = [];
+          for (let category of this.categories) {
+            names.push(category.name);
+          }
+          return names;
+        }
+      },
+      //получаем список имен компаний для форм добавления и изменения товара
+      company_names: function () {
+        if (this.companies) {
+          let names = [];
+          for (let company of this.companies) {
+            names.push(company.name);
+          }
+          return names;
+        }
+      },
     },
-    //при открытии компонента загружаем с сервера список Компаний
+    //при открытии компонента загружаем с сервера список Товаров, Категорий, Компаний
     mounted() {
       axios
         .get(this.appConfig.api_url+'/getProduct')
         .then(response => (this.products = response.data));
+      axios
+        .get(this.appConfig.api_url+'/getCompany')
+        .then(response => (this.companies = response.data));
+      axios
+        .get(this.appConfig.api_url + '/getCategory')
+        .then(response => (this.categories = response.data));
     },
     methods: {
       //метод получения списка товаров от сервера
@@ -266,9 +301,18 @@
         }
 
       },
+      edit_select(){
+        if(this.selected.length == 0) {
+          alert('Выберете товар для изменения');
+          return;
+        }
+        if(this.selected.length > 1) {
+          alert('Выберете только один товар для изменения');
+          return;
+        }
+        this.form_edit = true;
+      },
       edit() {
-        if(this.companyData.name) {
-          console.log(this.companyData.id);
           axios
             .put(this.appConfig.api_url+'/putCompany', {
               id: this.companyData.id,
@@ -288,15 +332,28 @@
           })
             .catch(function (err) {
               alert('Ошибка - объект не изменен');
-            })
-        }
+            });
         this.companyData = {};
         this.form_edit = false;
+        }
+
       }
-
-    }
-
   }
 </script>
-<style>
+<style lang="stylus">
+  .my-sticky-header-table
+    /* max height is important */
+    .q-table__middle
+      max-height 600px
+
+    .q-table__top,
+    .q-table__bottom,
+    thead tr:first-child th /* bg color is important for th; just specify one */
+      background-color #c1f4cd
+
+    thead tr:first-child th
+      position sticky
+      top 0
+      opacity 1
+      z-index 1
 </style>
