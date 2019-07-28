@@ -1,9 +1,21 @@
 <template>
-  <div class="q-pa-md">
+  <div class="q-pa-md q-gutter-y-sm">
     <!-- header for this component-->
     <q-toolbar class="bg-grey-8 text-white shadow-2">
       <q-toolbar-title>Товары</q-toolbar-title>
-      <q-btn @click="form_add = true" label="Добавить" outline color="white" />
+      <q-input flat dark dense standout v-model="search_text" input-class="text-right" class="q-ml-md">
+        <template v-slot:append>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+      <q-space />
+      <q-btn flat @click="form_add = true" label="Добавить" outline color="white" />
+      <div class="text-white q-gutter-xs">
+        <q-btn @click="dialog_delete = true" class="gt-xs" size="12px"
+               flat
+               dense round
+               icon="delete" />
+      </div>
     </q-toolbar>
 
     <!-- products table -->
@@ -12,14 +24,16 @@
       :columns="columns_products"
       row-key="name"
       :pagination.sync="pagination"
+      :selected-rows-label="getSelectedString"
+      selection="multiple"
+      :selected.sync="selected"
       hide-bottom
     />
-
     <!-- dialog for delete submit -->
     <q-dialog v-model="dialog_delete" persistent>
       <q-card>
         <q-card-section class="row items-center">
-          <span class="q-ml-sm">Вы уверены, что хотите удалить компанию {{productData.name}}?</span>
+          <span class="q-ml-sm">Удалить выбранное?</span>
         </q-card-section>
         <!-- Notice v-close-popup -->
         <q-card-actions align="right">
@@ -146,6 +160,8 @@
         dialog_delete: false,
         form_add: false,
         form_edit: false,
+        selected: [],
+        search_text: '',
         columns_products: [
           {
             name: 'name',
@@ -172,7 +188,17 @@
     computed: {
       data_products: function() {
         if(this.products){
-          return this.products;
+          if(!this.search_text) return this.products;
+          else {
+            let data = [];
+            for(let product of this.products){
+              let name = product.name.toLowerCase();
+              if(name.indexOf(this.search_text.toLowerCase()) !== -1){
+                data.push(product);
+              }
+            }
+            return data;
+          }
         }
       }
     },
@@ -183,28 +209,40 @@
         .then(response => (this.products = response.data));
     },
     methods: {
-      //метод получения списка компаний от сервера
+      //метод получения списка товаров от сервера
       get_products() {
         axios
           .get(this.appConfig.api_url+'/getProduct')
           .then(response => (this.products = response.data));
       },
-      //метод - удаление компании
-      del() {
-        axios
-          .delete(this.appConfig.api_url+'/delCompany', {
-            params: {
-              id: this.companyData.id
-            }
-          }).then((res) => {
-          console.log('Ответ сервера:', res);
-          if (res.status == 204) this.get_categories();
-        }).catch(function (err) {
-          alert('Удалить не получилось');
-        })
-        this.companyData = {};
+      // получение списка выбранных строк из таблицы
+      getSelectedString () {
+        return this.selected.length === 0 ? '' : `${this.selected.length} record${this.selected.length > 1 ? 's' : ''}          selected of ${this.data.length}`
       },
-      // метод добавления компании
+      //метод - удаление товаров
+      del() {
+        if(this.selected.length == 0){
+          alert('Ничего не выбрано');
+          return;
+        }
+        console.log(this.selected[0].id);
+        for(let i=0; i<this.selected.length; i++) {
+          axios
+            .delete(this.appConfig.api_url + '/delProduct', {
+                params: {
+                  id: this.selected[i].id
+                }
+              }
+            ).then((res) => {
+            console.log('Ответ сервера:', res);
+            if (res.status == 204) this.get_products();
+          }).catch(function (err) {
+            alert('Удалить не получилось');
+          })
+        }
+        this.selected = [];
+      },
+      // метод добавления товара
       add() {
         if(this.productData.name) {
           axios.post(this.appConfig.api_url+'/addProduct',
@@ -224,8 +262,9 @@
             .catch(function (err) {
               alert('Ошибка - объект не добавлен');
             })
+          this.companyData = {};
         }
-        this.companyData = {};
+
       },
       edit() {
         if(this.companyData.name) {
