@@ -29,7 +29,6 @@
       :selected-rows-label="getSelectedString"
       selection="multiple"
       :selected.sync="selected"
-      hide-bottom
     />
     <!-- dialog for delete submit -->
     <q-dialog v-model="dialog_delete" persistent>
@@ -77,8 +76,8 @@
               v-model="productData.description"
               label="Описание"
             />
-            <q-select v-model="productData.CategoryId" :options="category_names" label="категория" />
-            <q-select v-model="productData.CompanyId" :options="company_names" label="компания" />
+            <q-select v-model="category_select" :options="category_names" label="категория" />
+            <q-select v-model="company_select" :options="company_names" label="компания" />
             <q-input
               filled
               v-model="productData.price"
@@ -106,11 +105,31 @@
               keep-color
               label="Доступен"
             />
+            <q-btn @click="form_photo = true" label="Фото" type="submit" class="bg-positive"/>
 
             <div>
               <q-btn @click="add" label="Добавить" type="submit" color="primary"/>
               <q-btn @click="productData = {}" label="Сброс" type="reset" color="primary" flat
                      class="q-ml-sm" />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <!-- form add photo products -->
+    <q-dialog v-model="form_photo">
+      <q-card style="min-width: 400px">
+        <q-bar  class="bg-positive text-white">
+          <div>Фото товара</div>
+          <q-space />
+          <q-btn dense flat icon="close" @click="productData={}" v-close-popup ></q-btn>
+        </q-bar>
+        <q-card-section class="row items-center">
+          <q-form  class="q-gutter-md">
+
+            <div>
+              <q-btn @click="edit" label="Добавить" type="submit" color="primary"/>
             </div>
           </q-form>
         </q-card-section>
@@ -168,7 +187,10 @@
         dialog_delete: false,
         form_add: false,
         form_edit: false,
+        form_photo: false,
         selected: [],
+        category_select:'',
+        company_select:'',
         search_text: '',
         columns_products: [
           {
@@ -188,7 +210,7 @@
           sortBy: 'name',
           descending: false,
           page: 1,
-          rowsPerPage: 0
+          rowsPerPage: 10
           // rowsNumber: xx if getting data from a server
         },
       }
@@ -230,8 +252,18 @@
           return names;
         }
       },
+      CategoryId: function () {
+        for(let category of this.categories){
+          if(category.name == this.category_select) return category.id;
+        }
+      },
+      CompanyId: function () {
+        for(let company of this.companies){
+          if(company.name == this.company_select) return company.id;
+        }
+      }
     },
-    //при открытии компонента загружаем с сервера список Товаров, Категорий, Компаний
+    //при открытии страницы загружаем с сервера список Товаров, Категорий, Компаний
     mounted() {
       axios
         .get(this.appConfig.api_url+'/getProduct')
@@ -280,6 +312,9 @@
       // метод добавления товара
       add() {
         if(this.productData.name) {
+          this.productData.CategoryId = this.CategoryId;
+          this.productData.CompanyId = this.CompanyId;
+          console.log(this.productData);
           axios.post(this.appConfig.api_url+'/addProduct',
             this.productData
           ).then((res) => {
