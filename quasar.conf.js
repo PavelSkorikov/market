@@ -65,7 +65,8 @@ module.exports = function (ctx) {
         'QTable',
         'QTh',
         'QTr',
-        'QTd'
+        'QTd',
+        'QUploader'
       ],
 
       directives: [
