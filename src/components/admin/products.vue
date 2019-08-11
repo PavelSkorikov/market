@@ -49,6 +49,11 @@
     <!-- form for create product-->
     <q-dialog v-model="form_add">
       <q-card class="my-card" style="min-width: 700px">
+        <q-bar  class="bg-positive text-white">
+          <div>Добавить товар</div>
+          <q-space />
+          <q-btn dense flat icon="close" @click="productData={}" v-close-popup></q-btn>
+        </q-bar>
         <div class="row">
           <div class="col-6">
         <q-card-section>
@@ -103,11 +108,6 @@
               keep-color
               label="Доступен"
             />
-            <q-input
-              @input="val => { productData.images = val[0] }"
-              filled
-              type="file"
-            />
             <div>
               <q-btn @click="add" label="Добавить" type="submit" color="primary"/>
               <q-btn @click="productData = {}" label="Сброс" type="reset" color="primary" flat
@@ -116,13 +116,13 @@
           </q-form>
         </q-card-section>
           </div>
+          <!-- форма для загрузки изображений товаров на сервер -->
         <div class="col-6">
-
         <q-card-section>
               <q-uploader
                 label="Фото товара (общий объем не более 3Мб)"
-                auto-upload
                 :factory="factoryFn"
+                @uploaded="uploadedFile"
                 :max-total-size="3145728"
                 multiple
                 batch
@@ -139,35 +139,92 @@
 
     <!-- form for edit product -->
     <q-dialog v-model="form_edit">
-      <q-card style="min-width: 400px">
+      <q-card class="my-card" style="min-width: 700px">
         <q-bar  class="bg-positive text-white">
-          <div>Редактировать компанию</div>
+          <div>Изменить товар</div>
           <q-space />
-          <q-btn dense flat icon="close" @click="productData={}" v-close-popup ></q-btn>
+          <q-btn dense flat icon="close" @click="productData={}" v-close-popup></q-btn>
         </q-bar>
-        <q-card-section class="row items-center">
-          <q-form  class="q-gutter-md">
-            <q-input
-              square
-              filled
-              v-model="productData.name"
-              label="Название компании"
-              lazy-rules
-              :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']"
-              style="min-width: 370px"
-            />
-            <q-input
-              type = 'textarea'
-              square
-              outlined
-              v-model="productData.description"
-              label="Описание"
-            />
-            <div>
-              <q-btn @click="edit" label="Изменить" type="submit" color="primary"/>
-            </div>
-          </q-form>
-        </q-card-section>
+        <div class="row">
+          <div class="col-6">
+            <q-card-section>
+              <q-form  class="q-gutter-md">
+                <q-input
+                  square
+                  filled
+                  v-model="productData.name"
+                  label="Название товара"
+                  lazy-rules
+                  :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']"
+                />
+                <q-input
+                  square
+                  outlined
+                  v-model="productData.model"
+                  label="Модель"
+                />
+                <q-input
+                  type = 'textarea'
+                  square
+                  outlined
+                  v-model="productData.description"
+                  label="Описание"
+                />
+                <q-select v-model="category_select" :options="category_names" label="категория" />
+                <q-select v-model="company_select" :options="company_names" label="компания" />
+                <q-input
+                  filled
+                  v-model="productData.price"
+                  prefix="$"
+                  square
+                  mask="#.##"
+                  reverse-fill-mask
+                  input-class="text-right"
+                  label="Цена"
+                  lazy-rules
+                  :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']"
+                />
+                <q-input
+                  filled
+                  v-model="productData.count"
+                  square
+                  mask="##"
+                  reverse-fill-mask
+                  input-class="text-right"
+                  label="Количество"
+                />
+                <q-toggle
+                  v-model="productData.availability"
+                  color="green"
+                  keep-color
+                  label="Доступен"
+                />
+                <div>
+                  <q-btn @click="add" label="Добавить" type="submit" color="primary"/>
+                  <q-btn @click="productData = {}" label="Сброс" type="reset" color="primary" flat
+                         class="q-ml-sm" />
+                </div>
+              </q-form>
+            </q-card-section>
+          </div>
+          <!-- форма для загрузки изображений товаров на сервер -->
+          <div class="col-6">
+            <q-card-section>
+              <q-uploader
+                label="Фото товара (общий объем не более 3Мб)"
+                :factory="factoryFn"
+                @uploaded="uploadedFile"
+                :max-total-size="3145728"
+                multiple
+                batch
+                square
+                flat
+                bordered
+                style="max-height: 800px"
+              />
+            </q-card-section>
+          </div>
+        </div>
       </q-card>
     </q-dialog>
 
@@ -293,7 +350,6 @@
           alert('Ничего не выбрано');
           return;
         }
-        console.log(this.selected[0].id);
         for (let i = 0; i < this.selected.length; i++) {
           axios
             .delete(this.appConfig.api_url + '/delProduct', {
@@ -316,17 +372,9 @@
           //добавляем в передаваемые данные Категорию и Компанию
           this.productData.CategoryId = this.CategoryId;
           this.productData.CompanyId = this.CompanyId;
-          //формируем объект bodyFormData для передачи с помощью axios
-          // формы с файлом в кодировке multipart/formdata
-          var bodyFormData = new FormData();
-          for(let key in this.productData){
-            bodyFormData.append(key, this.productData[key]);
-          }
-          // отправляем сформированную форму, не забыв установить заголовок
-          // Content-Type в multipart/formdata и добавить разделитель boundary
+
           axios.post(this.appConfig.api_url + '/addProduct',
-            bodyFormData,
-            { headers: { 'Content-Type': 'multipart/formdata; boundary=${bodyFormData._boundary}' } }
+            this.productData
           ).then((res) => {
             console.log('Ответ сервера:', res);
             if (res.status == 200) {
@@ -355,6 +403,14 @@
           alert('Выберете только один товар для изменения');
           return;
         }
+        this.productData.id = this.selected[0].id;
+        this.productData.name = this.selected[0].name;
+        this.productData.model = this.selected[0].model;
+        this.productData.description = this.selected[0].description;
+        this.productData.count = Number(this.selected[0].count);
+        this.productData.price = +this.selected[0].price;
+        this.productData.availability = this.selected[0].availability;
+        console.log(this.selected[0].price);
         this.form_edit = true;
       },
       edit() {
@@ -392,6 +448,11 @@
             })
           }, 3000)
         })
+      },
+      //функция обработчик ответа сервера после загрузки файлов(фото товара)
+      uploadedFile(info) {
+        console.log(info.xhr.response);
+        this.productData.files = JSON.parse(info.xhr.response);
       }
     }
   }
