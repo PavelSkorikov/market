@@ -52,7 +52,8 @@
         <q-bar  class="bg-positive text-white">
           <div>Добавить товар</div>
           <q-space />
-          <q-btn dense flat icon="close" @click="productData={}" v-close-popup></q-btn>
+          <q-btn dense flat icon="close" @click="productData={}, category_select = null, company_select =
+          null" v-close-popup></q-btn>
         </q-bar>
         <div class="row">
           <div class="col-6">
@@ -110,8 +111,8 @@
             />
             <div>
               <q-btn @click="add" label="Добавить" type="submit" color="primary"/>
-              <q-btn @click="productData = {}" label="Сброс" type="reset" color="primary" flat
-                     class="q-ml-sm" />
+              <q-btn @click="productData = {}, category_select = null, company_select =
+          null" label="Сброс" type="reset" color="primary" flat class="q-ml-sm" />
             </div>
           </q-form>
         </q-card-section>
@@ -124,6 +125,7 @@
                 :factory="factoryFn"
                 @uploaded="uploadedFile"
                 :max-total-size="3145728"
+                accept=".jpg, image/*"
                 multiple
                 batch
                 square
@@ -139,14 +141,15 @@
 
     <!-- form for edit product -->
     <q-dialog v-model="form_edit">
-      <q-card class="my-card" style="min-width: 700px">
+      <q-card class="my-card" style="min-width: 1050px">
         <q-bar  class="bg-positive text-white">
           <div>Изменить товар</div>
           <q-space />
-          <q-btn dense flat icon="close" @click="productData={}" v-close-popup></q-btn>
+          <q-btn dense flat icon="close" @click="productData={}, category_select = null, company_select =
+          null" v-close-popup></q-btn>
         </q-bar>
         <div class="row">
-          <div class="col-6">
+          <div class="col-4">
             <q-card-section>
               <q-form  class="q-gutter-md">
                 <q-input
@@ -200,18 +203,21 @@
                   label="Доступен"
                 />
                 <div>
-                  <q-btn @click="add" label="Добавить" type="submit" color="primary"/>
-                  <q-btn @click="productData = {}" label="Сброс" type="reset" color="primary" flat
-                         class="q-ml-sm" />
+                  <q-btn @click="edit" label="Изменить" type="submit" color="primary"/>
                 </div>
               </q-form>
             </q-card-section>
           </div>
-          <!-- форма для загрузки изображений товаров на сервер -->
-          <div class="col-6">
+          <div class="col-4">
+            <q-item v-for="image in images" :key="image.id">
+              <img :src="image.path" @click="imageEdit=true, path=image.path">
+            </q-item>
+          </div>
+          <!-- форма для добавления изображений товара -->
+          <div class="col-4">
             <q-card-section>
               <q-uploader
-                label="Фото товара (общий объем не более 3Мб)"
+                label="Добавить фото"
                 :factory="factoryFn"
                 @uploaded="uploadedFile"
                 :max-total-size="3145728"
@@ -220,12 +226,29 @@
                 square
                 flat
                 bordered
-                style="max-height: 800px"
-              />
+                style="max-height: 300px"/>
             </q-card-section>
           </div>
         </div>
       </q-card>
+    </q-dialog>
+
+    <!-- form for edit image product -->
+    <q-dialog v-model="imageEdit">
+      <q-card class="my-card" style="min-width: 1050px">
+        <q-bar  class="bg-positive text-white">
+          <div>Фото товара</div>
+          <q-space />
+          <q-btn dense flat icon="close" v-close-popup></q-btn>
+        </q-bar>
+        <q-card-section>
+        <img :src="path" style="width: 1020px">
+        </q-card-section>
+        <q-card-section>
+          <q-btn @click="delImage" label="УДАЛИТЬ" type="submit" color="primary"/>
+        </q-card-section>
+      </q-card>
+
     </q-dialog>
 
   </div>
@@ -239,13 +262,16 @@
     data() {
       return {
         productData: {},
+        images: {},
         products: null,
         categories: null,
         companies: null,
+        path: null,
         dialog_delete: false,
         form_add: false,
         form_edit: false,
         form_photo: false,
+        imageEdit: false,
         selected: [],
         category_select: '',
         company_select: '',
@@ -391,6 +417,8 @@
               alert('Ошибка - объект не добавлен');
             });
           this.companyData = {};
+          this.category_select = null;
+          this.company_select = null;
         }
       },
 
@@ -403,40 +431,79 @@
           alert('Выберете только один товар для изменения');
           return;
         }
+        // заполняем форму данными выбранного товара
+        // которые берем из объекта this.selected[0](отмеченный галочкой товар) таблицы товаров
+        console.log(this.selected[0]);
         this.productData.id = this.selected[0].id;
+        console.log(this.productData.id);
         this.productData.name = this.selected[0].name;
         this.productData.model = this.selected[0].model;
         this.productData.description = this.selected[0].description;
-        this.productData.count = Number(this.selected[0].count);
-        this.productData.price = +this.selected[0].price;
+        // вычисляем имя категории и компании товара по id категории и компании
+        for (let category of this.categories) {
+          if(category.id == this.selected[0].CategoryId){
+            this.category_select = category.name;
+          }
+        }
+        for (let company of this.companies) {
+          if(company.id == this.selected[0].CompanyId){
+            this.company_select = company.name;
+          }
+        }
+        // количество и цену преобразуем в строку поскольку маски данных полей
+        // требуют строковые данные
+        this.productData.count = this.selected[0].count.toString();
+        this.productData.price = this.selected[0].price.toString();
         this.productData.availability = this.selected[0].availability;
-        console.log(this.selected[0].price);
+        // скачиваем с сервера пути к фотографиям товара по id товара
+        axios
+          .get(this.appConfig.api_url + '/getImage', {
+            params: {
+              id: this.productData.id
+            }
+          })
+          .then(response => {
+            this.images = response.data;
+            console.log(this.images);
+          });
+        // наконец открываем форму с полученными данными товара
         this.form_edit = true;
       },
+
+      //метод изменения товара
       edit() {
-        axios
-          .put(this.appConfig.api_url + '/putCompany', {
-            id: this.companyData.id,
-            name: this.companyData.name,
-            description: this.companyData.description
-          }).then((res) => {
-          console.log('Ответ сервера:', res);
-          if (res.status == 204) {
-            this.$q.notify({
-              color: 'green-4',
-              textColor: 'white',
-              icon: 'fas fa-check-circle',
-              message: 'Изменено'
+        if (this.productData.name) {
+          //добавляем в передаваемые данные Категорию и Компанию
+          this.productData.CategoryId = this.CategoryId;
+          this.productData.CompanyId = this.CompanyId;
+          axios
+            .put(this.appConfig.api_url + '/putProduct', this.productData)
+            .then((res) => {
+            console.log('Ответ сервера:', res);
+            if (res.status == 204) {
+              this.$q.notify({
+                color: 'green-4',
+                textColor: 'white',
+                icon: 'fas fa-check-circle',
+                message: 'Изменено'
+              });
+            }
+            this.get_products();
+          })
+            .catch(function (err) {
+              alert('Ошибка - объект не изменен');
             });
-          }
-          this.get_categories();
-        })
-          .catch(function (err) {
-            alert('Ошибка - объект не изменен');
-          });
-        this.companyData = {};
-        this.form_edit = false;
+          this.proData = {};
+          this.form_edit = false;
+        }
       },
+
+      //метод для удаления изображения товара, как файла, так и записи в базе Image
+      delImage(){
+
+      },
+
+
       //функция обработчик для загрузки фотографий товаров на сервер
       factoryFn(files) {
         return new Promise((resolve) => {
@@ -453,10 +520,12 @@
       uploadedFile(info) {
         console.log(info.xhr.response);
         this.productData.files = JSON.parse(info.xhr.response);
-      }
+      },
     }
   }
 </script>
+
+
 <style lang="stylus">
   .my-sticky-header-table
     /* max height is important */
