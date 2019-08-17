@@ -146,7 +146,7 @@
           <div>Изменить товар</div>
           <q-space />
           <q-btn dense flat icon="close" @click="productData={}, category_select = null, company_select =
-          null" v-close-popup></q-btn>
+          null, selected=[]" v-close-popup></q-btn>
         </q-bar>
         <div class="row">
           <div class="col-4">
@@ -210,7 +210,7 @@
           </div>
           <div class="col-4">
             <q-item v-for="image in images" :key="image.id">
-              <img :src="image.path" @click="imageEdit=true, path=image.path">
+              <img :src="image.path" @click="imageEdit=true, imageSelect=image">
             </q-item>
           </div>
           <!-- форма для добавления изображений товара -->
@@ -226,7 +226,7 @@
                 square
                 flat
                 bordered
-                style="max-height: 300px"/>
+                style="max-height: 800px"/>
             </q-card-section>
           </div>
         </div>
@@ -239,10 +239,10 @@
         <q-bar  class="bg-positive text-white">
           <div>Фото товара</div>
           <q-space />
-          <q-btn dense flat icon="close" v-close-popup></q-btn>
+          <q-btn dense flat icon="close" @click="imageSelect={}" v-close-popup></q-btn>
         </q-bar>
         <q-card-section>
-        <img :src="path" style="width: 1020px">
+        <img :src="imageSelect.path" style="width: 1020px">
         </q-card-section>
         <q-card-section>
           <q-btn @click="delImage" label="УДАЛИТЬ" type="submit" color="primary"/>
@@ -266,7 +266,7 @@
         products: null,
         categories: null,
         companies: null,
-        path: null,
+        imageSelect: {},
         dialog_delete: false,
         form_add: false,
         form_edit: false,
@@ -286,9 +286,12 @@
             sortable: true
           },
           {name: 'model', align: 'left', label: 'Модель', field: 'model'},
+          {name: 'category', label: 'Категория', field: 'CategoryId', sortable: true},
+          {name: 'company', label: 'Компания', field: 'CompanyId', sortable: true},
           {name: 'price', label: 'Цена(руб.)', field: 'price', sortable: true},
           {name: 'count', label: 'Количество(шт.)', field: 'count', sortable: true},
-          {name: 'availability', label: 'Доступность', field: 'availability', sortable: true}
+          {name: 'availability', label: 'Доступность', field: 'availability', sortable: true},
+          {name: 'date', label: 'Дата добавления', field: 'createdAt', sortable: true}
         ],
         pagination: {
           sortBy: 'name',
@@ -298,11 +301,28 @@
         },
       }
     },
+
     computed: {
-      //фильтруем список товаров по заданному слову из строки поиска
+
+      // метод формирования списка товаров для вывода на экран
       data_products: function () {
-        if (this.products) {
+        //если загружены с сервера данные по товарам, категориям и компаниям
+        if (this.products && this.categories && this.companies) {
+          //в списке товаров преобразуем полученный id категории в имя категории
+          this.products.forEach((product) => {
+            this.categories.forEach((category) => {
+              if(category.id == product.CategoryId) product.CategoryId = category.name;
+            })
+          });
+          //в списке товаров преобразуем полученный id компании в имя компании
+          this.products.forEach((product) => {
+            this.companies.forEach((company) => {
+              if(company.id == product.CompanyId) product.CompanyId = company.name;
+            })
+          });
+          //если в строке поиска ничего не набрано выводим список товаров как есть
           if (!this.search_text) return this.products;
+          //иначе фильтруем список товаров по заданному слову из строки поиска
           else {
             let data = [];
             for (let product of this.products) {
@@ -315,6 +335,7 @@
           }
         }
       },
+
       //получаем список имен категорий для форм добавления и изменения товара
       category_names: function () {
         if (this.categories) {
@@ -325,6 +346,7 @@
           return names;
         }
       },
+
       //получаем список имен компаний для форм добавления и изменения товара
       company_names: function () {
         if (this.companies) {
@@ -335,29 +357,36 @@
           return names;
         }
       },
+
+      //вычисляем id категории по выбранному из списка имени категории
       CategoryId: function () {
         for (let category of this.categories) {
           if (category.name == this.category_select) return category.id;
         }
       },
+
+      //вычисляем id компании по выбранному из списка имени компании
       CompanyId: function () {
         for (let company of this.companies) {
           if (company.name == this.company_select) return company.id;
         }
       }
     },
+
     //при открытии страницы загружаем с сервера список Товаров, Категорий, Компаний
     mounted() {
-      axios
-        .get(this.appConfig.api_url + '/getProduct')
-        .then(response => (this.products = response.data));
       axios
         .get(this.appConfig.api_url + '/getCompany')
         .then(response => (this.companies = response.data));
       axios
         .get(this.appConfig.api_url + '/getCategory')
         .then(response => (this.categories = response.data));
+      axios
+        .get(this.appConfig.api_url + '/getProduct')
+        .then(response => (this.products = response.data));
+
     },
+
     methods: {
       //метод получения списка товаров от сервера
       get_products() {
@@ -365,11 +394,13 @@
           .get(this.appConfig.api_url + '/getProduct')
           .then(response => (this.products = response.data));
       },
+
       // получение списка выбранных строк из таблицы
       getSelectedString() {
         return this.selected.length === 0 ? '' :
           `${this.selected.length} record${this.selected.length > 1 ? 's' : ''} selected of ${this.selected.length}`
       },
+
       //метод - удаление товаров
       del() {
         if (this.selected.length == 0) {
@@ -392,6 +423,7 @@
         }
         this.selected = [];
       },
+
       // метод добавления товара c фото
       add() {
         if (this.productData.name) {
@@ -422,6 +454,7 @@
         }
       },
 
+      //метод заполнения данными формы для редактирования товара
       edit_select() {
         if (this.selected.length == 0) {
           alert('Выберете товар для изменения');
@@ -493,16 +526,32 @@
             .catch(function (err) {
               alert('Ошибка - объект не изменен');
             });
-          this.proData = {};
+          this.selected = [];
           this.form_edit = false;
         }
       },
 
       //метод для удаления изображения товара, как файла, так и записи в базе Image
       delImage(){
-
+        if(this.imageSelect){
+          axios
+            .delete(this.appConfig.api_url + '/delImage', {
+                params: {
+                  id: this.imageSelect.id,
+                  path: this.imageSelect.path
+                }
+              }
+            ).then((res) => {
+            console.log('Ответ сервера:', res);
+            if (res.status == 204) {
+              this.edit_select();
+              this.imageEdit = false;
+            }
+          }).catch(function (err) {
+            alert('Удалить не получилось');
+          })
+        }
       },
-
 
       //функция обработчик для загрузки фотографий товаров на сервер
       factoryFn(files) {
@@ -516,6 +565,7 @@
           }, 3000)
         })
       },
+
       //функция обработчик ответа сервера после загрузки файлов(фото товара)
       uploadedFile(info) {
         console.log(info.xhr.response);

@@ -36,7 +36,7 @@
                 </q-menu>
               </q-tab>
               <q-route-tab to="/admin/products" icon="category" label="Товары">
-                <q-badge color="orange" floating>0</q-badge>
+                <q-badge color="orange" floating>{{countProducts}}</q-badge>
               </q-route-tab>
               </q-tab>
               <q-route-tab to="/admin/categories" icon="format_align_left" label="Категории">
@@ -70,6 +70,8 @@
 </template>
 
 <script>
+  import axios from 'axios';
+
   export default {
     name: 'Admin'
     ,
@@ -79,6 +81,15 @@
         showing_products: false,
         showing_categories: false,
         showing_companies: false,
+      }
+    },
+
+    computed: {
+      countProducts: function () {
+        axios.get(this.appConfig.api_url + '/countProduct')
+          .then(response => {
+            console.log(response.data);
+            return response.data })
       }
     }
   }
