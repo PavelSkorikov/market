@@ -377,14 +377,22 @@
     mounted() {
       axios
         .get(this.appConfig.api_url + '/getCompany')
-        .then(response => (this.companies = response.data));
+        .then(response => (this.companies = response.data))
+        .catch(function (err) {
+            alert('Не удалось связаться с сервером');
+      });
       axios
         .get(this.appConfig.api_url + '/getCategory')
-        .then(response => (this.categories = response.data));
+        .then(response => (this.categories = response.data))
+        .catch(function (err) {
+            alert('Не удалось связаться с сервером')
+        });
       axios
         .get(this.appConfig.api_url + '/getProduct')
-        .then(response => (this.products = response.data));
-
+        .then(response => (this.products = response.data))
+        .catch(function (err) {
+            alert('Не удалось связаться с сервером')
+        });
     },
 
     methods: {

@@ -20,7 +20,7 @@
         <div class="col-8">
             <q-tabs align="left" class="bg-positive" text-color="white">
               <q-tab name="users" @click="showing_users = true" icon="account_box" label="Пользователи">
-                <q-badge color="orange" floating>0</q-badge>
+                <q-badge color="orange" floating>{{countUsers}}</q-badge>
                 <q-menu v-model="showing_users"
                         transition-show="flip-right"
                         transition-hide="flip-left">
@@ -40,14 +40,14 @@
               </q-route-tab>
               </q-tab>
               <q-route-tab to="/admin/categories" icon="format_align_left" label="Категории">
-                <q-badge color="orange" floating>0</q-badge>
+                <q-badge color="orange" floating>{{countCategories}}</q-badge>
               </q-route-tab>
               </q-tab>
               <q-route-tab to="/admin/companies" icon="domain" label="Компании">
-                <q-badge color="orange" floating>0</q-badge>
+                <q-badge color="orange" floating>{{countCompanies}}</q-badge>
               </q-route-tab>
               <q-route-tab name="orders" to="/admin/orders" icon="shop" label="Заказы">
-                <q-badge color="orange" floating>0</q-badge>
+                <q-badge color="orange" floating>{{countOrders}}</q-badge>
               </q-route-tab>
               <q-route-tab to="/admin/statistics" icon="insert_chart" label="Статистика" />
             </q-tabs>
@@ -73,25 +73,39 @@
   import axios from 'axios';
 
   export default {
-    name: 'Admin'
-    ,
+    name: 'Admin',
     data () {
       return {
         showing_users: false,
-        showing_products: false,
-        showing_categories: false,
-        showing_companies: false,
+        countUsers: '0',
+        countProducts: '0',
+        countCategories: '0',
+        countCompanies: '0',
+        countOrders: '0'
       }
     },
 
-    computed: {
-      countProducts: function () {
+    mounted() {
         axios.get(this.appConfig.api_url + '/countProduct')
           .then(response => {
-            console.log(response.data);
-            return response.data })
-      }
-    }
+            this.countProducts = response.data })
+          .catch(function (err) {
+            alert('Не удалось связаться с сервером')
+          });
+        axios.get(this.appConfig.api_url + '/countCategories')
+          .then(response => {
+            this.countCategories = response.data })
+          .catch(function (err) {
+            alert('Не удалось связаться с сервером')
+          });
+        axios.get(this.appConfig.api_url + '/countCompanies')
+          .then(response => {
+            this.countCompanies = response.data })
+          .catch(function (err) {
+            alert('Не удалось связаться с сервером')
+          });
+    },
+
   }
 </script>
 
