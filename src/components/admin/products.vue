@@ -456,7 +456,7 @@
             .catch(function (err) {
               alert('Ошибка - объект не добавлен');
             });
-          this.companyData = {};
+          this.productData = {};
           this.category_select = null;
           this.company_select = null;
         }

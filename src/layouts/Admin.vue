@@ -19,22 +19,9 @@
         <div class="col-2"></div>
         <div class="col-8">
             <q-tabs align="left" class="bg-positive" text-color="white">
-              <q-tab name="users" @click="showing_users = true" icon="account_box" label="Пользователи">
+              <q-route-tab to="/admin/users" icon="account_box" label="Пользователи">
                 <q-badge color="orange" floating>{{countUsers}}</q-badge>
-                <q-menu v-model="showing_users"
-                        transition-show="flip-right"
-                        transition-hide="flip-left">
-                  <q-list style="min-width: 100px">
-                    <q-item clickable v-close-popup to="/admin/users_add">
-                      <q-item-section>Добавить</q-item-section>
-                    </q-item>
-                    <q-separator />
-                    <q-item clickable v-close-popup to="/admin/users">
-                      <q-item-section>Список</q-item-section>
-                    </q-item>
-                  </q-list>
-                </q-menu>
-              </q-tab>
+              </q-route-tab>
               <q-route-tab to="/admin/products" icon="category" label="Товары">
                 <q-badge color="orange" floating>{{countProducts}}</q-badge>
               </q-route-tab>
@@ -76,7 +63,6 @@
     name: 'Admin',
     data () {
       return {
-        showing_users: false,
         countUsers: '0',
         countProducts: '0',
         countCategories: '0',
@@ -85,26 +71,31 @@
       }
     },
 
+    // при открытии страницы запрашиваем от сервера количество
     mounted() {
-        axios.get(this.appConfig.api_url + '/countProduct')
-          .then(response => {
-            this.countProducts = response.data })
-          .catch(function (err) {
-            alert('Не удалось связаться с сервером')
-          });
-        axios.get(this.appConfig.api_url + '/countCategories')
-          .then(response => {
-            this.countCategories = response.data })
-          .catch(function (err) {
-            alert('Не удалось связаться с сервером')
-          });
-        axios.get(this.appConfig.api_url + '/countCompanies')
-          .then(response => {
-            this.countCompanies = response.data })
-          .catch(function (err) {
-            alert('Не удалось связаться с сервером')
-          });
+      this.get_count();
     },
+    // при обновлении страницы запрашиваем от сервера количество
+    updated() {
+      this.get_count();
+    },
+
+    methods: {
+      // метод который опрашивает сервер для получения количества пользователей,
+      // товаров, категорий, компаний, заказов
+      get_count(){
+        axios.get(this.appConfig.api_url + '/countItems')
+          .then(response => {
+            this.countUsers = response.data.user;
+            this.countProducts = response.data.product;
+            this.countCompanies = response.data.company;
+            this.countCategories = response.data.category;
+          })
+          .catch(function (err) {
+            alert('Не удалось получить количество элементов в базе данных')
+          });
+      }
+    }
 
   }
 </script>
