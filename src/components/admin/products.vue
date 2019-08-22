@@ -155,7 +155,7 @@
                 <q-input
                   square
                   filled
-                  v-model="productData.name"
+                  v-model="name"
                   label="Название товара"
                   lazy-rules
                   :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']"
@@ -163,21 +163,21 @@
                 <q-input
                   square
                   outlined
-                  v-model="productData.model"
+                  v-model="model"
                   label="Модель"
                 />
                 <q-input
                   type = 'textarea'
                   square
                   outlined
-                  v-model="productData.description"
+                  v-model="description"
                   label="Описание"
                 />
                 <q-select v-model="category_select" :options="category_names" label="категория" />
                 <q-select v-model="company_select" :options="company_names" label="компания" />
                 <q-input
                   filled
-                  v-model="productData.price"
+                  v-model="price"
                   prefix="$"
                   square
                   mask="#.##"
@@ -189,7 +189,7 @@
                 />
                 <q-input
                   filled
-                  v-model="productData.count"
+                  v-model="count"
                   square
                   mask="##"
                   reverse-fill-mask
@@ -197,7 +197,7 @@
                   label="Количество"
                 />
                 <q-toggle
-                  v-model="productData.availability"
+                  v-model="availability"
                   color="green"
                   keep-color
                   label="Доступен"
@@ -262,6 +262,14 @@
     data() {
       return {
         productData: {},
+        id: null,
+        name: null,
+        model: null,
+        description: null,
+        count: null,
+        price: null,
+        availability: null,
+        files: null,
         images: {},
         products: null,
         categories: null,
@@ -474,12 +482,10 @@
         }
         // заполняем форму данными выбранного товара
         // которые берем из объекта this.selected[0](отмеченный галочкой товар) таблицы товаров
-        console.log(this.selected[0]);
-        this.productData.id = this.selected[0].id;
-        console.log(this.productData.id);
-        this.productData.name = this.selected[0].name;
-        this.productData.model = this.selected[0].model;
-        this.productData.description = this.selected[0].description;
+        this.id = this.selected[0].id;
+        this.name = this.selected[0].name;
+        this.model = this.selected[0].model;
+        this.description = this.selected[0].description;
         // вычисляем имя категории и компании товара по id категории и компании
         for (let category of this.categories) {
           if(category.id == this.selected[0].CategoryId){
@@ -493,19 +499,19 @@
         }
         // количество и цену преобразуем в строку поскольку маски данных полей
         // требуют строковые данные
-        this.productData.count = this.selected[0].count.toString();
-        this.productData.price = this.selected[0].price.toString();
-        this.productData.availability = this.selected[0].availability;
+        this.count = this.selected[0].count.toString();
+        this.price = this.selected[0].price.toString();
+        this.availability = this.selected[0].availability;
+        this.files = null;
         // скачиваем с сервера пути к фотографиям товара по id товара
         axios
           .get(this.appConfig.api_url + '/getImage', {
             params: {
-              id: this.productData.id
+              id: this.id
             }
           })
           .then(response => {
             this.images = response.data;
-            console.log(this.images);
           });
         // наконец открываем форму с полученными данными товара
         this.form_edit = true;
@@ -513,12 +519,19 @@
 
       //метод изменения товара
       edit() {
-        if (this.productData.name) {
-          //добавляем в передаваемые данные Категорию и Компанию
-          this.productData.CategoryId = this.CategoryId;
-          this.productData.CompanyId = this.CompanyId;
           axios
-            .put(this.appConfig.api_url + '/putProduct', this.productData)
+            .put(this.appConfig.api_url + '/putProduct', {
+              id: this.id,
+              name: this.name,
+              model: this.model,
+              description: this.description,
+              CategoryId: this.CategoryId,
+              CompanyId: this.CompanyId,
+              count: this.count,
+              price: this.price,
+              availability: this.availability,
+              files: this.files
+            })
             .then((res) => {
             console.log('Ответ сервера:', res);
             if (res.status == 204) {
@@ -536,7 +549,6 @@
             });
           this.selected = [];
           this.form_edit = false;
-        }
       },
 
       //метод для удаления изображения товара, как файла, так и записи в базе Image
@@ -577,7 +589,7 @@
       //функция обработчик ответа сервера после загрузки файлов(фото товара)
       uploadedFile(info) {
         console.log(info.xhr.response);
-        this.productData.files = JSON.parse(info.xhr.response);
+        this.files = JSON.parse(info.xhr.response);
       },
     }
   }

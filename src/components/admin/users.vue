@@ -116,49 +116,47 @@
     <q-dialog v-model="form_edit">
       <q-card class="my-card" style="min-width: 700px">
         <q-bar  class="bg-positive text-white">
-          <div>Изменить пользователя</div>
-          <q-space />
-          <q-btn dense flat icon="close" @click="userData_edit={}" v-close-popup></q-btn>
+          <div>Изменить данные пользователя</div>
+          <q-space/>
+          <q-btn dense flat icon="close" @click="userData={}, selected=[]" v-close-popup></q-btn>
         </q-bar>
-        <q-card-section>
-          <q-form  class="q-gutter-md">
-            <!-- поле ввода e-mail -->
-            <q-input
-              square
-              filled type="email"
-              v-model="userData_edit.email"
-              label="E-mail"
-              lazy-rules
-              :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']">
-              <template v-slot:before>
-                <q-icon name="mail" />
-              </template>
-            </q-input>
-            <!-- поле выбора группы для пользователя -->
-            <q-select
-              v-model="userData_edit.group"
-              :options="groups"
-              label="Группа" />
-            <!-- поле выбора статуса пользователя -->
-            <q-select
-              v-model="userData_edit.status"
-              :options="userStatuses"
-              label="Статус" />
-            <!-- поле ввода скидки для пользователя -->
-            <q-input
-              filled
-              type="number"
-              prefix="%"
-              v-model="userData_edit.discount"
-              square
-              label="Скидка"
-            />
-            <!-- кнопки выбора действия -->
-            <div>
+            <q-card-section>
+              <q-form>
+                <q-input
+                  square
+                  filled type="email"
+                  v-model="email"
+                  label="E-mail"
+                  lazy-rules
+                  :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']">
+                  <template v-slot:before>
+                    <q-icon name="mail" />
+                  </template>
+                </q-input>
+                <!-- поле выбора группы для пользователя -->
+                <q-select
+                  v-model="group"
+                  :options="groups"
+                  label="Группа" />
+                <!-- поле выбора статуса пользователя -->
+                <q-select
+                  v-model="status"
+                  :options="userStatuses"
+                  label="Статус" />
+                <!-- поле ввода скидки для пользователя -->
+                <q-input
+                  filled
+                  type="number"
+                  prefix="%"
+                  v-model.number="discount"
+                  square
+                  label="Скидка"
+                />
+              </q-form>
+            </q-card-section>
+          <q-card-actions>
               <q-btn @click="edit" label="Изменить" type="submit" color="primary"/>
-            </div>
-          </q-form>
-        </q-card-section>
+          </q-card-actions>
       </q-card>
     </q-dialog>
   </div>
@@ -176,7 +174,11 @@ export default {
     return {
       search_text: '',
       userData: {},
-      userData_edit: {},
+      id: null,
+      email: null,
+      group: null,
+      discount: null,
+      status: null,
       groups: ['administrator', 'user'],
       users: null,
       userStatuses: ['Заблокирован', 'Активен'],
@@ -309,20 +311,26 @@ export default {
       }
       // заполняем форму данными выбранного пользователя
       // которые берем из объекта this.selected[0](отмеченная галочкой строка) таблицы
-      this.userData_edit.id = this.selected[0].id;
-      this.userData_edit.email = this.selected[0].email;
-      this.userData_edit.group = this.selected[0].group;
-      this.userData_edit.status = this.selected[0].status;
-      this.userData_edit.discount = this.selected[0].discount;
-      // открываем форму с полученными данными пользователя
+      this.id = this.selected[0].id;
+      this.email = this.selected[0].email;
+      this.group = this.selected[0].group;
+      this.status = this.selected[0].status;
+      this.discount = this.selected[0].discount;
+      //открываем форму
       this.form_edit = true;
     },
 
     //метод изменения данных пользователя
     edit() {
-      if (this.userData.email) {
+      if (this.email) {
         axios
-          .put(this.appConfig.api_url + '/putUser', this.userData_edit)
+          .put(this.appConfig.api_url + '/putUser', {
+            id: this.id,
+            email: this.email,
+            group: this.group,
+            status: this.status,
+            discount: this.discount
+          })
           .then((res) => {
             console.log('Ответ сервера:', res);
             if (res.status == 204) {
