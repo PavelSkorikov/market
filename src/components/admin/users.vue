@@ -11,6 +11,7 @@
       <q-space />
       <q-btn flat @click="form_add = true" label="Добавить пользователя" outline color="white" />
       <q-btn flat @click="edit_select" label="Изменить" outline color="white" />
+      <q-btn flat @click="form_password=true" label="Сменить пароль" outline color="white" />
       <div class="text-white q-gutter-xs">
         <q-btn @click="dialog_delete = true" class="gt-xs" size="12px"
                flat
@@ -54,61 +55,94 @@
           <q-space />
           <q-btn dense flat icon="close" @click="userData={}" v-close-popup></q-btn>
         </q-bar>
-            <q-card-section>
-              <q-form  class="q-gutter-md">
-                <!-- поле ввода e-mail -->
-                <q-input
-                  square
-                  filled type="email"
-                  v-model="userData.email"
-                  label="E-mail"
-                  lazy-rules
-                  :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']">
-                  <template v-slot:before>
-                    <q-icon name="mail" />
-                  </template>
-                </q-input>
-                <!-- поле ввода пароля -->
-                <q-input
-                  v-model="userData.password"
-                  label="Пароль"
-                  filled
-                  :type="isPwd ? 'password' : 'text'"
-                  :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']">
-                  <template v-slot:append>
-                    <q-icon
-                      :name="isPwd ? 'visibility_off' : 'visibility'"
-                      class="cursor-pointer"
-                      @click="isPwd = !isPwd"
-                    />
-                  </template>
-                </q-input>
-                <!-- поле выбора группы для пользователя -->
-                <q-select
-                  v-model="userData.group"
-                  :options="groups"
-                  label="Группа" />
-                <!-- поле выбора статуса пользователя -->
-                <q-select
-                  v-model="userData.status"
-                  :options="userStatuses"
-                  label="Статус" />
-                <!-- поле ввода скидки для пользователя -->
-                <q-input
-                  filled
-                  type="number"
-                  prefix="%"
-                  v-model="userData.discount"
-                  square
-                  label="Скидка"
+        <q-card-section>
+          <q-form  class="q-gutter-md">
+            <!-- поле ввода e-mail -->
+            <q-input
+              square
+              filled type="email"
+              v-model="userData.email"
+              label="E-mail"
+              lazy-rules
+              :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']">
+              <template v-slot:before>
+                <q-icon name="mail" />
+              </template>
+            </q-input>
+            <!-- поле ввода пароля -->
+            <q-input
+              v-model="userData.password"
+              label="Пароль"
+              filled
+              :type="isPwd ? 'password' : 'text'"
+              :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']">
+              <template v-slot:append>
+                <q-icon
+                  :name="isPwd ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="isPwd = !isPwd"
                 />
-                <!-- кнопки выбора действия -->
-                <div>
-                  <q-btn @click="add" label="Добавить" type="submit" color="primary"/>
-                  <q-btn @click="userData = {}" label="Сброс" type="reset" color="primary" flat class="q-ml-sm" />
-                </div>
-              </q-form>
-            </q-card-section>
+              </template>
+            </q-input>
+            <!-- поле выбора группы для пользователя -->
+            <q-select
+              v-model="userData.group"
+              :options="groups"
+              label="Группа" />
+            <!-- поле выбора статуса пользователя -->
+            <q-select
+              v-model="userData.status"
+              :options="userStatuses"
+              label="Статус" />
+            <!-- поле ввода скидки для пользователя -->
+            <q-input
+              filled
+              type="number"
+              prefix="%"
+              v-model="userData.discount"
+              square
+              label="Скидка"
+            />
+            <!-- кнопки выбора действия -->
+            <div>
+              <q-btn @click="add" label="Добавить" type="submit" color="primary"/>
+              <q-btn @click="userData = {}" label="Сброс" type="reset" color="primary" flat class="q-ml-sm" />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <!-- форма смены пароля пользователя -->
+    <q-dialog v-model="form_password">
+      <q-card class="my-card" style="min-width: 700px">
+        <q-bar  class="bg-positive text-white">
+          <div>Сменить пароль</div>
+          <q-space />
+          <q-btn dense flat icon="close" @click="userData={}" v-close-popup></q-btn>
+        </q-bar>
+        <q-card-section>
+          <q-form  class="q-gutter-md">
+            <!-- поле ввода пароля -->
+            <q-input
+              v-model="password"
+              label="Пароль"
+              filled
+              :type="isPwd ? 'password' : 'text'"
+              :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']">
+              <template v-slot:append>
+                <q-icon
+                  :name="isPwd ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="isPwd = !isPwd"
+                />
+              </template>
+            </q-input>
+            <div>
+              <q-btn @click="change_password" label="Сменить" type="submit" color="primary"/>
+            </div>
+          </q-form>
+        </q-card-section>
       </q-card>
     </q-dialog>
 
@@ -176,6 +210,7 @@ export default {
       userData: {},
       id: null,
       email: null,
+      password: null,
       group: null,
       discount: null,
       status: null,
@@ -186,6 +221,7 @@ export default {
       dialog_delete: false,
       form_add: false,
       form_edit: false,
+      form_password: false,
       selected: [],
       columns_users: [
         {
@@ -322,7 +358,7 @@ export default {
 
     //метод изменения данных пользователя
     edit() {
-      if (this.email) {
+      if (this.id && this.email && this.group && this.status) {
         axios
           .put(this.appConfig.api_url + '/putUser', {
             id: this.id,
@@ -347,7 +383,47 @@ export default {
             alert('Ошибка - объект не изменен');
           });
         this.selected = [];
+        this.id = null;
+        this.email = null;
+        this.group = null;
+        this.status = null;
+        this.discount = null;
         this.form_edit = false;
+      }
+    },
+
+    //метод смены пароля для выбранного пользователя
+    change_password() {
+      // если строка в таблице не выбрана или выбрано больше одной строки
+      // выводим сообщение об ошибке
+      if (this.selected.length == 0 || this.selected.length > 1) {
+        alert('Выберете одного пользователя для изменения');
+        return;
+      }
+      if (this.password) {
+        axios
+          .put(this.appConfig.api_url + '/putUser', {
+            id: this.selected[0].id,
+            password: this.password
+          })
+          .then((res) => {
+            console.log('Ответ сервера:', res);
+            if (res.status == 204) {
+              this.$q.notify({
+                color: 'green-4',
+                textColor: 'white',
+                icon: 'fas fa-check-circle',
+                message: 'Изменено'
+              });
+            }
+            this.getUsers();
+          })
+          .catch(function (err) {
+            alert('Ошибка - объект не изменен');
+          });
+        this.selected = [];
+        this.password = null;
+        this.form_password = false;
       }
     },
 
