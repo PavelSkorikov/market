@@ -126,21 +126,19 @@
   },
     //при открытии компонента загружаем с сервера список Компаний
   mounted() {
-    axios
-    .get(this.appConfig.api_url+'/getCompany')
-      .then(response => (this.companies = response.data));
+    this.get_companies();
   },
   methods: {
     //метод получения списка компаний от сервера
     get_companies() {
       axios
-        .get(this.appConfig.api_url+'/getCompany')
+        .get(this.appConfig.admin_url+'/getCompany')
         .then(response => (this.companies = response.data));
     },
     //метод - удаление компании
     del() {
           axios
-          .delete(this.appConfig.api_url+'/delCompany', {
+          .delete(this.appConfig.admin_url+'/delCompany', {
             params: {
               id: this.companyData.id
             }
@@ -155,7 +153,7 @@
     // метод добавления компании
     add() {
       if(this.companyData.name) {
-        axios.post(this.appConfig.api_url+'/addCompany', {
+        axios.post(this.appConfig.admin_url+'/addCompany', {
           name: this.companyData.name,
           description: this.companyData.description
         }).then((res) => {
@@ -180,7 +178,7 @@
       if(this.companyData.name) {
         console.log(this.companyData.id);
         axios
-          .put(this.appConfig.api_url+'/putCompany', {
+          .put(this.appConfig.admin_url+'/putCompany', {
               id: this.companyData.id,
               name: this.companyData.name,
               description: this.companyData.description

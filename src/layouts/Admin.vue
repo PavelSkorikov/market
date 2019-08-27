@@ -84,7 +84,7 @@
       // метод который опрашивает сервер для получения количества пользователей,
       // товаров, категорий, компаний, заказов
       get_count(){
-        axios.get(this.appConfig.api_url + '/countItems')
+        axios.get(this.appConfig.admin_url + '/countItems')
           .then(response => {
             this.countUsers = response.data.user;
             this.countProducts = response.data.product;

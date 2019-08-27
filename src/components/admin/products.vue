@@ -384,19 +384,19 @@
     //при открытии страницы загружаем с сервера список Товаров, Категорий, Компаний
     mounted() {
       axios
-        .get(this.appConfig.api_url + '/getCompany')
+        .get(this.appConfig.admin_url + '/getCompany')
         .then(response => (this.companies = response.data))
         .catch(function (err) {
             alert('Не удалось связаться с сервером');
       });
       axios
-        .get(this.appConfig.api_url + '/getCategory')
+        .get(this.appConfig.admin_url + '/getCategory')
         .then(response => (this.categories = response.data))
         .catch(function (err) {
             alert('Не удалось связаться с сервером')
         });
       axios
-        .get(this.appConfig.api_url + '/getProduct')
+        .get(this.appConfig.admin_url + '/getProduct')
         .then(response => (this.products = response.data))
         .catch(function (err) {
             alert('Не удалось связаться с сервером')
@@ -407,7 +407,7 @@
       //метод получения списка товаров от сервера
       get_products() {
         axios
-          .get(this.appConfig.api_url + '/getProduct')
+          .get(this.appConfig.admin_url + '/getProduct')
           .then(response => (this.products = response.data));
       },
 
@@ -425,7 +425,7 @@
         }
         for (let i = 0; i < this.selected.length; i++) {
           axios
-            .delete(this.appConfig.api_url + '/delProduct', {
+            .delete(this.appConfig.admin_url + '/delProduct', {
                 params: {
                   id: this.selected[i].id
                 }
@@ -447,7 +447,7 @@
           this.productData.CategoryId = this.CategoryId;
           this.productData.CompanyId = this.CompanyId;
 
-          axios.post(this.appConfig.api_url + '/addProduct',
+          axios.post(this.appConfig.admin_url + '/addProduct',
             this.productData
           ).then((res) => {
             console.log('Ответ сервера:', res);
@@ -505,7 +505,7 @@
         this.files = null;
         // скачиваем с сервера пути к фотографиям товара по id товара
         axios
-          .get(this.appConfig.api_url + '/getImage', {
+          .get(this.appConfig.admin_url + '/getImage', {
             params: {
               id: this.id
             }
@@ -520,7 +520,7 @@
       //метод изменения товара
       edit() {
           axios
-            .put(this.appConfig.api_url + '/putProduct', {
+            .put(this.appConfig.admin_url + '/putProduct', {
               id: this.id,
               name: this.name,
               model: this.model,
@@ -555,7 +555,7 @@
       delImage(){
         if(this.imageSelect){
           axios
-            .delete(this.appConfig.api_url + '/delImage', {
+            .delete(this.appConfig.admin_url + '/delImage', {
                 params: {
                   id: this.imageSelect.id,
                   path: this.imageSelect.path
@@ -579,7 +579,7 @@
           // simulating a delay of 2 seconds
           setTimeout(() => {
             resolve({
-              url: this.appConfig.api_url + '/addImage',
+              url: this.appConfig.admin_url + '/addImage',
               method: 'POST'
             })
           }, 3000)

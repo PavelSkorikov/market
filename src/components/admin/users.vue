@@ -278,7 +278,7 @@ export default {
     // метод получения списка пользователей с сервера
     getUsers() {
       axios
-        .get(this.appConfig.api_url + '/getUsers')
+        .get(this.appConfig.admin_url + '/getUsers')
         .then(response => (this.users = response.data))
         .catch(function (err) {
           alert('Не удалось получить список пользователей')
@@ -294,7 +294,7 @@ export default {
     // метод создания пользователя
     add() {
       if (this.userData.email) {
-        axios.post(this.appConfig.api_url + '/addUser',
+        axios.post(this.appConfig.admin_url + '/addUser',
           this.userData
         ).then((res) => {
           console.log('Ответ сервера:', res);
@@ -323,7 +323,7 @@ export default {
       }
       for (let i = 0; i < this.selected.length; i++) {
         axios
-          .delete(this.appConfig.api_url + '/delUser', {
+          .delete(this.appConfig.admin_url + '/delUser', {
               params: {
                 id: this.selected[i].id
               }
@@ -360,7 +360,7 @@ export default {
     edit() {
       if (this.id && this.email && this.group && this.status) {
         axios
-          .put(this.appConfig.api_url + '/putUser', {
+          .put(this.appConfig.admin_url + '/putUser', {
             id: this.id,
             email: this.email,
             group: this.group,
@@ -402,7 +402,7 @@ export default {
       }
       if (this.password) {
         axios
-          .put(this.appConfig.api_url + '/putUser', {
+          .put(this.appConfig.admin_url + '/putUser', {
             id: this.selected[0].id,
             password: this.password
           })

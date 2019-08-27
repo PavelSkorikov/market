@@ -123,7 +123,7 @@
     //with open a component load list categories from server
     mounted() {
       axios
-        .get(this.appConfig.api_url + '/getCategory')
+        .get(this.appConfig.admin_url + '/getCategory')
         .then(response => (this.categories = response.data));
     },
     watch: {
@@ -196,13 +196,13 @@
           //method get list categories from server
           get_categories() {
             axios
-              .get(this.appConfig.api_url + '/getCategory')
+              .get(this.appConfig.admin_url + '/getCategory')
               .then(response => (this.categories = response.data));
           },
           //method - delete category
           del() {
             axios
-              .delete(this.appConfig.api_url + '/delCategory', {
+              .delete(this.appConfig.admin_url + '/delCategory', {
                 params: {
                   id: this.categoryData.id,
                   name: this.categoryData.name
@@ -219,7 +219,7 @@
           // method - create category
           add() {
             if (this.categoryData.name) {
-              axios.post(this.appConfig.api_url + '/addCategory', {
+              axios.post(this.appConfig.admin_url + '/addCategory', {
                   name: this.categoryData.name,
                   description: this.categoryData.description,
                   parent_name: this.categoryData.parent_name
@@ -245,7 +245,7 @@
           edit() {
             if (this.categoryData.name) {
               axios
-                .put(this.appConfig.api_url + '/putCategory', {
+                .put(this.appConfig.admin_url + '/putCategory', {
                   id: this.categoryData.id,
                   name: this.categoryData.name,
                   description: this.categoryData.description,
