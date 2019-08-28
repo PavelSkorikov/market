@@ -25,7 +25,7 @@
       class="my-sticky-header-table"
       :data="data_users"
       :columns="columns_users"
-      row-key="email"
+      row-key="name"
       :pagination.sync="pagination"
       :selected-rows-label="getSelectedString"
       selection="multiple"
@@ -57,6 +57,15 @@
         </q-bar>
         <q-card-section>
           <q-form  class="q-gutter-md">
+            <!-- поле ввода имени пользователя -->
+            <q-input
+              square
+              filled type="text"
+              v-model="userData.name"
+              label="Имя"
+              lazy-rules
+              :rules="[ val => val && val.length > 0 || 'Пожалуйста введите имя']">
+            </q-input>
             <!-- поле ввода e-mail -->
             <q-input
               square
@@ -64,7 +73,7 @@
               v-model="userData.email"
               label="E-mail"
               lazy-rules
-              :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']">
+              :rules="[ val => val && val.length > 0 || 'Пожалуйста введите e-mail']">
               <template v-slot:before>
                 <q-icon name="mail" />
               </template>
@@ -75,7 +84,7 @@
               label="Пароль"
               filled
               :type="isPwd ? 'password' : 'text'"
-              :rules="[ val => val && val.length > 0 || 'Пожалуйста введите что нибудь']">
+              :rules="[ val => val && val.length > 0 || 'Пожалуйста введите пароль']">
               <template v-slot:append>
                 <q-icon
                   :name="isPwd ? 'visibility_off' : 'visibility'"
@@ -156,6 +165,15 @@
         </q-bar>
             <q-card-section>
               <q-form>
+                <!-- поле ввода имени пользователя -->
+                <q-input
+                  square
+                  filled type="text"
+                  v-model="name"
+                  label="Имя"
+                  lazy-rules
+                  :rules="[ val => val && val.length > 0 || 'Пожалуйста введите имя']">
+                </q-input>
                 <q-input
                   square
                   filled type="email"
@@ -209,6 +227,7 @@ export default {
       search_text: '',
       userData: {},
       id: null,
+      name: null,
       email: null,
       password: null,
       group: null,
@@ -225,13 +244,14 @@ export default {
       selected: [],
       columns_users: [
         {
-          name: 'email',
+          name: 'name',
           required: true,
-          label: 'E-mail',
+          label: 'Имя',
           align: 'left',
-          field: row => row.email,
+          field: row => row.name,
           sortable: true
         },
+        {name: 'email', label: 'E-mail', field: 'email', sortable: true},
         {name: 'group', label: 'Права доступа', field: 'group', sortable: true},
         {name: 'status', label: 'Статус', field: 'status', sortable: true},
         {name: 'discount', label: 'Скидка', field: 'discount', sortable: true},
@@ -262,8 +282,8 @@ export default {
         else {
           let data = [];
           for (let user of this.users) {
-            let email = user.email.toLowerCase();
-            if (email.indexOf(this.search_text.toLowerCase()) !== -1) {
+            let name = user.name.toLowerCase();
+            if (name.indexOf(this.search_text.toLowerCase()) !== -1) {
               data.push(user);
             }
           }
@@ -348,6 +368,7 @@ export default {
       // заполняем форму данными выбранного пользователя
       // которые берем из объекта this.selected[0](отмеченная галочкой строка) таблицы
       this.id = this.selected[0].id;
+      this.name = this.selected[0].name;
       this.email = this.selected[0].email;
       this.group = this.selected[0].group;
       this.status = this.selected[0].status;
@@ -358,10 +379,11 @@ export default {
 
     //метод изменения данных пользователя
     edit() {
-      if (this.id && this.email && this.group && this.status) {
+      if (this.id && this.name && this.email && this.group && this.status) {
         axios
           .put(this.appConfig.admin_url + '/putUser', {
             id: this.id,
+            name: this.name,
             email: this.email,
             group: this.group,
             status: this.status,
@@ -384,6 +406,7 @@ export default {
           });
         this.selected = [];
         this.id = null;
+        this.name = null;
         this.email = null;
         this.group = null;
         this.status = null;

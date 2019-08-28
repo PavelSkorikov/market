@@ -9,7 +9,7 @@
             <img src="/assets/logo-market.png">
           </q-avatar>
         <q-toolbar-title style="cursor: pointer">Страница администратора</q-toolbar-title>
-        <q-btn flat style="color: orange" label="Выход" />
+        <q-btn flat style="color: orange" label="Выход" to="/" />
       </q-toolbar>
         </div>
         <div class="col-2"></div>

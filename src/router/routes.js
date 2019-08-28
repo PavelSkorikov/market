@@ -7,6 +7,8 @@ import Categories from 'components/admin/categories.vue'
 import Companies from 'components/admin/companies.vue'
 import Orders from 'components/admin/orders.vue'
 import Statistics from 'components/admin/statistics.vue'
+import Login from 'components/auth/login.vue'
+import Register from 'components/auth/register.vue'
 
 const routes = [
   {
@@ -16,10 +18,17 @@ const routes = [
       { path: '', components: {content: Main}},
       { path: '/dostavka', components: {content: Dostavka}},
       { path: '/oplata', components: {content: Oplata}},
-    ]
+      { path: '/login',  components: {content: Login}},
+      { path: '/register',  components: {content: Register}},
+    ],
+    meta: {
+      guest: true
+    }
     },
+
   {
     path: '/admin',
+    name: 'admin',
     component: () => import('layouts/Admin.vue'),
     children: [
       { path: '/admin/users', components: {admin_content: Users}},
@@ -28,9 +37,13 @@ const routes = [
       { path: '/admin/companies', components: {admin_content: Companies}},
       { path: '/admin/orders', components: {admin_content: Orders}},
       { path: '/admin/statistics', components: {admin_content: Statistics}},
-    ]
+    ],
+    meta: {
+      requiresAuth: true,
+      is_admin : true
+    }
   }
-]
+];
 
 // Always leave this as last one
 if (process.env.MODE !== 'ssr') {
