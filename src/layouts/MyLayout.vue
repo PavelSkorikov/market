@@ -12,18 +12,22 @@
           </q-avatar>
         <q-toolbar-title v-go-back=" '/' " style="cursor: pointer">Online Магазин</q-toolbar-title>
         <q-btn to="/admin" flat style="color: white" v-if="localStorage.group == 'administrator'" label="Админ" />
-        <q-btn flat style="color: white" label="Регистрация" />
+        <q-btn flat style="color: white" label="Регистрация" to="/register" />
         <q-btn flat style="color: orange" label="Войти" v-if="!localStorage.token" to="/login" />
+        <!--выпадающее меню пользователя -->
         <q-btn flat style="color: orange" :label="localStorage.name" v-if="localStorage.token">
           <q-menu>
             <q-list style="min-width: 100px">
+              <q-item clickable v-close-popup>
+                <q-item-section>Профиль</q-item-section>
+              </q-item>
+              <q-separator />
               <q-item clickable v-close-popup @click="logout">
                 <q-item-section>Выйти</q-item-section>
               </q-item>
             </q-list>
           </q-menu>
         </q-btn>
-
       </q-toolbar>
         </div>
         <div class="col-2"></div>
@@ -36,23 +40,23 @@
             <q-tabs align="left" class="bg-positive" text-color="white">
               <q-icon color="primary" name="catalog" />
               <q-route-tab to="/catalog" icon="menu" label="Каталог" />
-              <span style="color: #21BA45">eweqedsf</span>
-              <q-input outlined bg-color="white" v-model="text" :dense="dense" placeholder="Поиск товара">
-                <template v-slot:append>
-                  <q-icon color="primary" name="search"/>
-                </template>
-              </q-input>
               <q-route-tab to="/oplata" icon="money" label="Оплата"/>
               <q-route-tab to="/dostavka" icon="local_shipping" label="Доставка"/>
-              <q-tab name="equalizer" icon="equalizer" label="Сравнение">
-                <q-badge color="orange" floating>0</q-badge>
-              </q-tab>
               <q-tab name="favorite" icon="favorite" label="Избранное">
                 <q-badge color="orange" floating>0</q-badge>
               </q-tab>
               <q-tab name="basket" icon="shopping_cart" label="Корзина">
                 <q-badge color="orange" floating>0</q-badge>
               </q-tab>
+              <q-route-tab to="/confirm_order" icon="done_outline" label="Оформить заказ"/>
+              <q-space />
+              <div class="q-pa-md q-gutter-y-sm">
+              <q-input outlined bg-color="white" v-model="text" :dense="dense" placeholder="Поиск товара">
+                <template v-slot:append>
+                  <q-icon color="primary" name="search"/>
+                </template>
+              </q-input>
+              </div>
             </q-tabs>
         </div>
         <div class="col-2"></div>

@@ -235,7 +235,7 @@ export default {
       status: null,
       groups: ['administrator', 'user'],
       users: null,
-      userStatuses: ['Заблокирован', 'Активен'],
+      userStatuses: ['offline', 'online'],
       isPwd: true,
       dialog_delete: false,
       form_add: false,
