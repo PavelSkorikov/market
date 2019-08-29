@@ -43,7 +43,6 @@
 </template>
 
 <script>
-  import axios from 'axios';
 
 	export default {
     name: "Login",
@@ -63,7 +62,7 @@
       login() {
         if (this.userData.email && this.userData.password) {
           // отправляем email и пароль пользователя на сервер для аутентификации
-          axios.post(this.appConfig.auth_url + '/login',
+          this.$axios.post(this.appConfig.auth_url + '/login',
             this.userData
           ).then((res) => {
             // при успешной аутентификации получаем с сервера jwt токен и refreshtoken

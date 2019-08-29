@@ -57,14 +57,11 @@
 </template>
 
 <script>
-  import axios from 'axios';
-
 
   export default {
     name: 'Admin',
     data () {
       return {
-        localStorage: window.localStorage,
         countUsers: '0',
         countProducts: '0',
         countCategories: '0',
@@ -86,13 +83,7 @@
       // метод который опрашивает сервер для получения количества пользователей,
       // товаров, категорий, компаний, заказов
       get_count(){
-        const jwt_token = 'Bearer '+ this.localStorage.token;
-        console.log(jwt_token);
-        axios.get(this.appConfig.admin_url + '/countItems', {
-          headers: {
-            'Authorization': jwt_token
-          }
-        })
+        this.$axios.get(this.appConfig.admin_url + '/countItems')
           .then(response => {
             this.countUsers = response.data.user;
             this.countProducts = response.data.product;

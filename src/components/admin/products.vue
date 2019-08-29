@@ -255,7 +255,6 @@
 </template>
 
 <script>
-  import axios from 'axios';
 
   export default {
     name: 'Products',
@@ -383,19 +382,19 @@
 
     //при открытии страницы загружаем с сервера список Товаров, Категорий, Компаний
     mounted() {
-      axios
+      this.$axios
         .get(this.appConfig.admin_url + '/getCompany')
         .then(response => (this.companies = response.data))
         .catch(function (err) {
             alert('Не удалось связаться с сервером');
       });
-      axios
+      this.$axios
         .get(this.appConfig.admin_url + '/getCategory')
         .then(response => (this.categories = response.data))
         .catch(function (err) {
             alert('Не удалось связаться с сервером')
         });
-      axios
+      this.$axios
         .get(this.appConfig.admin_url + '/getProduct')
         .then(response => (this.products = response.data))
         .catch(function (err) {
@@ -406,7 +405,7 @@
     methods: {
       //метод получения списка товаров от сервера
       get_products() {
-        axios
+        this.$axios
           .get(this.appConfig.admin_url + '/getProduct')
           .then(response => (this.products = response.data));
       },
@@ -424,7 +423,7 @@
           return;
         }
         for (let i = 0; i < this.selected.length; i++) {
-          axios
+          this.$axios
             .delete(this.appConfig.admin_url + '/delProduct', {
                 params: {
                   id: this.selected[i].id
@@ -447,7 +446,7 @@
           this.productData.CategoryId = this.CategoryId;
           this.productData.CompanyId = this.CompanyId;
 
-          axios.post(this.appConfig.admin_url + '/addProduct',
+          this.$axios.post(this.appConfig.admin_url + '/addProduct',
             this.productData
           ).then((res) => {
             console.log('Ответ сервера:', res);
@@ -504,7 +503,7 @@
         this.availability = this.selected[0].availability;
         this.files = null;
         // скачиваем с сервера пути к фотографиям товара по id товара
-        axios
+        this.$axios
           .get(this.appConfig.admin_url + '/getImage', {
             params: {
               id: this.id
@@ -519,7 +518,7 @@
 
       //метод изменения товара
       edit() {
-          axios
+          this.$axios
             .put(this.appConfig.admin_url + '/putProduct', {
               id: this.id,
               name: this.name,
@@ -554,7 +553,7 @@
       //метод для удаления изображения товара, как файла, так и записи в базе Image
       delImage(){
         if(this.imageSelect){
-          axios
+          this.$axios
             .delete(this.appConfig.admin_url + '/delImage', {
                 params: {
                   id: this.imageSelect.id,
@@ -574,13 +573,21 @@
       },
 
       //функция обработчик для загрузки фотографий товаров на сервер
+      //добавляем заголовок авторизации со значением jwt token
       factoryFn(files) {
         return new Promise((resolve) => {
+          const localStorage = window.localStorage;
+          let  token = '';
+          if(localStorage.token) token = 'Bearer '+ localStorage.getItem('token');
           // simulating a delay of 2 seconds
           setTimeout(() => {
             resolve({
               url: this.appConfig.admin_url + '/addImage',
-              method: 'POST'
+              method: 'POST',
+              headers: [{
+                name: 'Authorization',
+                value: token
+              }]
             })
           }, 3000)
         })

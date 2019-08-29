@@ -12,7 +12,7 @@
           </q-avatar>
         <q-toolbar-title v-go-back=" '/' " style="cursor: pointer">Online Магазин</q-toolbar-title>
         <q-btn to="/admin" flat style="color: white" v-if="localStorage.group == 'administrator'" label="Админ" />
-        <q-btn flat style="color: white" label="Регистрация" to="/register" />
+        <q-btn flat style="color: white" label="Регистрация" v-if="!localStorage.token" to="/register" />
         <q-btn flat style="color: orange" label="Войти" v-if="!localStorage.token" to="/login" />
         <!--выпадающее меню пользователя -->
         <q-btn flat style="color: orange" :label="localStorage.name" v-if="localStorage.token">
@@ -28,6 +28,12 @@
             </q-list>
           </q-menu>
         </q-btn>
+        <!-- поисковая строка -->
+        <q-input outlined bg-color="white" v-model="text" :dense="dense" placeholder="Поиск товара">
+          <template v-slot:append>
+            <q-icon color="primary" name="search"/>
+          </template>
+        </q-input>
       </q-toolbar>
         </div>
         <div class="col-2"></div>
@@ -39,6 +45,7 @@
         <div class="col-8">
             <q-tabs align="left" class="bg-positive" text-color="white">
               <q-icon color="primary" name="catalog" />
+              <q-route-tab to="/" icon="home" label="Главная" />
               <q-route-tab to="/catalog" icon="menu" label="Каталог" />
               <q-route-tab to="/oplata" icon="money" label="Оплата"/>
               <q-route-tab to="/dostavka" icon="local_shipping" label="Доставка"/>
@@ -51,11 +58,6 @@
               <q-route-tab to="/confirm_order" icon="done_outline" label="Оформить заказ"/>
               <q-space />
               <div class="q-pa-md q-gutter-y-sm">
-              <q-input outlined bg-color="white" v-model="text" :dense="dense" placeholder="Поиск товара">
-                <template v-slot:append>
-                  <q-icon color="primary" name="search"/>
-                </template>
-              </q-input>
               </div>
             </q-tabs>
         </div>

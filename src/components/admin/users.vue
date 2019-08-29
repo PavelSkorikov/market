@@ -218,8 +218,6 @@
 </style>
 
 <script>
-  import axios from 'axios';
-
 export default {
   name: 'Users',
   data() {
@@ -297,7 +295,7 @@ export default {
 
     // метод получения списка пользователей с сервера
     getUsers() {
-      axios
+      this.$axios
         .get(this.appConfig.admin_url + '/getUsers')
         .then(response => (this.users = response.data))
         .catch(function (err) {
@@ -314,7 +312,7 @@ export default {
     // метод создания пользователя
     add() {
       if (this.userData.email) {
-        axios.post(this.appConfig.admin_url + '/addUser',
+        this.$axios.post(this.appConfig.admin_url + '/addUser',
           this.userData
         ).then((res) => {
           console.log('Ответ сервера:', res);
@@ -342,7 +340,7 @@ export default {
         return;
       }
       for (let i = 0; i < this.selected.length; i++) {
-        axios
+        this.$axios
           .delete(this.appConfig.admin_url + '/delUser', {
               params: {
                 id: this.selected[i].id
@@ -380,7 +378,7 @@ export default {
     //метод изменения данных пользователя
     edit() {
       if (this.id && this.name && this.email && this.group && this.status) {
-        axios
+        this.$axios
           .put(this.appConfig.admin_url + '/putUser', {
             id: this.id,
             name: this.name,
@@ -424,7 +422,7 @@ export default {
         return;
       }
       if (this.password) {
-        axios
+        this.$axios
           .put(this.appConfig.admin_url + '/putUser', {
             id: this.selected[0].id,
             password: this.password

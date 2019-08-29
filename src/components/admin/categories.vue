@@ -106,7 +106,6 @@
 </template>
 
 <script>
-  import axios from 'axios';
 
   export default {
     name: 'Categories',
@@ -122,7 +121,7 @@
     },
     //with open a component load list categories from server
     mounted() {
-      axios
+      this.$axios
         .get(this.appConfig.admin_url + '/getCategory')
         .then(response => (this.categories = response.data));
     },
@@ -195,13 +194,13 @@
         methods: {
           //method get list categories from server
           get_categories() {
-            axios
+            this.$axios
               .get(this.appConfig.admin_url + '/getCategory')
               .then(response => (this.categories = response.data));
           },
           //method - delete category
           del() {
-            axios
+            this.$axios
               .delete(this.appConfig.admin_url + '/delCategory', {
                 params: {
                   id: this.categoryData.id,
@@ -219,7 +218,7 @@
           // method - create category
           add() {
             if (this.categoryData.name) {
-              axios.post(this.appConfig.admin_url + '/addCategory', {
+              this.$axios.post(this.appConfig.admin_url + '/addCategory', {
                   name: this.categoryData.name,
                   description: this.categoryData.description,
                   parent_name: this.categoryData.parent_name
@@ -244,7 +243,7 @@
           // method - edit category
           edit() {
             if (this.categoryData.name) {
-              axios
+              this.$axios
                 .put(this.appConfig.admin_url + '/putCategory', {
                   id: this.categoryData.id,
                   name: this.categoryData.name,

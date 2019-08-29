@@ -111,7 +111,6 @@
 </template>
 
 <script>
-  import axios from 'axios';
 
   export default {
   name: 'Companies',
@@ -131,13 +130,13 @@
   methods: {
     //метод получения списка компаний от сервера
     get_companies() {
-      axios
+      this.$axios
         .get(this.appConfig.admin_url+'/getCompany')
         .then(response => (this.companies = response.data));
     },
     //метод - удаление компании
     del() {
-          axios
+          this.$axios
           .delete(this.appConfig.admin_url+'/delCompany', {
             params: {
               id: this.companyData.id
@@ -153,7 +152,7 @@
     // метод добавления компании
     add() {
       if(this.companyData.name) {
-        axios.post(this.appConfig.admin_url+'/addCompany', {
+        this.$axios.post(this.appConfig.admin_url+'/addCompany', {
           name: this.companyData.name,
           description: this.companyData.description
         }).then((res) => {
@@ -177,7 +176,7 @@
     edit() {
       if(this.companyData.name) {
         console.log(this.companyData.id);
-        axios
+        this.$axios
           .put(this.appConfig.admin_url+'/putCompany', {
               id: this.companyData.id,
               name: this.companyData.name,

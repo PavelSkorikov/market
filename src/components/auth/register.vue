@@ -76,7 +76,6 @@
 </template>
 
 <script>
-  import axios from 'axios';
 
   export default {
     name: "Register",
@@ -97,7 +96,7 @@
       register() {
         if (this.userData.email && this.userData.password && this.userData.name) {
           // отправляем данные пользователя на сервер для регистрации
-          axios.post(this.appConfig.auth_url + '/register',
+          this.$axios.post(this.appConfig.auth_url + '/register',
             this.userData
           ).then((res) => {
             // при успешной аутентификации получаем с сервера jwt токен и refreshtoken
