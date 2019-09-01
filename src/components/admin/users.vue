@@ -311,6 +311,7 @@ export default {
 
     // метод создания пользователя
     add() {
+      alert(this.$store.state.token);
       if (this.userData.email) {
         this.$axios.post(this.appConfig.admin_url + '/addUser',
           this.userData

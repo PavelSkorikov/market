@@ -10,6 +10,7 @@ import Statistics from 'components/admin/statistics.vue'
 import Login from 'components/auth/login.vue'
 import Register from 'components/auth/register.vue'
 
+
 const routes = [
   {
     path: '/',
@@ -20,10 +21,7 @@ const routes = [
       { path: '/oplata', components: {content: Oplata}},
       { path: '/login',  components: {content: Login}},
       { path: '/register',  components: {content: Register}},
-    ],
-    meta: {
-      guest: true
-    }
+    ]
     },
 
   {
@@ -38,8 +36,9 @@ const routes = [
       { path: '/admin/orders', components: {admin_content: Orders}},
       { path: '/admin/statistics', components: {admin_content: Statistics}},
     ],
+    // прописываем в meta что данный маршрут требует авторизации и прав администратора
+    // сама логика обработки данного ограничения находится в index.js
     meta: {
-      requiresAuth: true,
       is_admin : true
     }
   }
@@ -52,5 +51,6 @@ if (process.env.MODE !== 'ssr') {
     component: () => import('pages/Error404.vue')
   })
 }
+
 
 export default routes

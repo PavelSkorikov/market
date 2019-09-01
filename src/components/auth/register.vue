@@ -95,22 +95,12 @@
       // регистрация пользователя
       register() {
         if (this.userData.email && this.userData.password && this.userData.name) {
-          // отправляем данные пользователя на сервер для регистрации
-          this.$axios.post(this.appConfig.auth_url + '/register',
-            this.userData
-          ).then((res) => {
-            // при успешной аутентификации получаем с сервера jwt токен и refreshtoken
-            this.localStorage.token = res.data.token;
-            this.localStorage.refreshtoken = res.data.refreshtoken;
-            this.localStorage.name = res.data.name;
-            this.localStorage.group = res.data.group;
-            this.userData = {};
-            this.$router.push('/');
-          })
-            .catch(function (err) {
-              alert('Ошибка регистрации попробуйте еще раз');
-            });
-          this.userData = {};
+          this.$store.dispatch('register', this.userData)
+            .then(() => {
+              this.userData = {};
+              this.$router.push('/')
+            })
+            .catch(err => console.log(err))
         }
       },
     }

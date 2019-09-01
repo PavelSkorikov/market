@@ -11,11 +11,11 @@
             <img src="/assets/logo-market.png">
           </q-avatar>
         <q-toolbar-title v-go-back=" '/' " style="cursor: pointer">Online Магазин</q-toolbar-title>
-        <q-btn to="/admin" flat style="color: white" v-if="localStorage.group == 'administrator'" label="Админ" />
-        <q-btn flat style="color: white" label="Регистрация" v-if="!localStorage.token" to="/register" />
-        <q-btn flat style="color: orange" label="Войти" v-if="!localStorage.token" to="/login" />
+        <q-btn to="/admin" flat style="color: white" v-if="isAdmin" label="Админ" />
+        <q-btn flat style="color: white" label="Регистрация" v-if="!isLoggedIn" to="/register" />
+        <q-btn flat style="color: orange" label="Войти" v-if="!isLoggedIn" to="/login" />
         <!--выпадающее меню пользователя -->
-        <q-btn flat style="color: orange" :label="localStorage.name" v-if="localStorage.token">
+        <q-btn flat style="color: orange" :label="userName" v-if="isLoggedIn">
           <q-menu>
             <q-list style="min-width: 100px">
               <q-item clickable v-close-popup>
@@ -96,30 +96,36 @@
 </template>
 
 <script>
-  import axios from 'axios';
   import Menu from "../components/menu";
-
   export default {
+    name: 'Main',
     components: {Menu},
     data() {
       return {
-        localStorage: window.localStorage,
         text: '',
         dense: true,
-        login: false,
-        userData: {},
-        isPwd: true,
+        isPwd: true
       }
     },
+    computed: {
+      isLoggedIn: function () {
+        if (this.$store.getters.isLoggedIn) return true;
+      },
+      isAdmin: function () {
+        if (this.$store.getters.isAdmin == 'administrator') return true;
+      },
+      userName: function () {
+        return this.$store.getters.userName;
+      }
+    },
+
     methods: {
       //логаут пользователя
       logout() {
-        this.localStorage.removeItem('token');
-        this.localStorage.removeItem('refreshtoken');
-        this.localStorage.removeItem('name');
-        this.localStorage.removeItem('group');
-        this.login = false;
-        document.location.replace('/');
+        this.$store.dispatch('logout')
+          .then(() => {
+            this.$router.push('/')
+          })
       }
     }
   }

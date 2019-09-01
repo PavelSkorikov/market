@@ -61,22 +61,13 @@
       // логин пользователя
       login() {
         if (this.userData.email && this.userData.password) {
-          // отправляем email и пароль пользователя на сервер для аутентификации
-          this.$axios.post(this.appConfig.auth_url + '/login',
-            this.userData
-          ).then((res) => {
-            // при успешной аутентификации получаем с сервера jwt токен и refreshtoken
-            this.localStorage.token = res.data.token;
-            this.localStorage.refreshtoken = res.data.refreshtoken;
-            this.localStorage.name = res.data.name;
-            this.localStorage.group = res.data.group;
-            this.userData = {};
-            this.$router.push('/');
-          })
-            .catch(function (err) {
-              alert('e-mail или пароль неверен, поробуйте еще раз');
-            });
-          this.userData = {};
+          let user = this.userData;
+          this.$store.dispatch('login', user)
+            .then(() => {
+              this.userData = {};
+              this.$router.push('/');
+            })
+            .catch(err => console.log(err))
         }
       },
     }

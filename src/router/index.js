@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
+import { store } from '../store/store'
+
 import routes from './routes'
 
 Vue.use(VueRouter);
@@ -23,38 +25,20 @@ export default function (/* { store, ssrContext } */) {
     base: process.env.VUE_ROUTER_BASE
   });
 
-  //определяем метод для роутов, который ограничивает доступ
-  //к определенным роутам в зависимости от данных авторизации
+  //создаем правила доступа для маршрутов на основании информации об авторизации пользователя
   Router.beforeEach((to, from, next) => {
-    //проверка, если нужен доступ как авторизованный пользователь
-    if(to.matched.some(record => record.meta.requiresAuth)) {
-      if (localStorage.token == null) {
-        next({
-          path: '/login',
-          params: { nextUrl: to.fullPath }
-        })
-      } else {
-        //проверка, если нужен доступ как администратор
-        if(to.matched.some(record => record.meta.is_admin)) {
-          if(localStorage.group == 'administrator'){
-            next()
-          }
-          else{
-            alert('Ваши права доступа недостаточны')
-          }
-        }else {
-          next()
-        }
+    // если маршрут требует прав администратора
+    if(to.matched.some(record => record.meta.is_admin)) {
+      // проверяем в хранилище Vuex авторизован ли пользователь и является ли он администратором
+      if (store.getters.isLoggedIn && store.getters.isAdmin == 'administrator') {
+        // если да разрешаем доступ
+        next();
+        return
       }
-      //проверка если не авторизованный пользователь(гость)
-    } else if(to.matched.some(record => record.meta.guest)) {
-      if(localStorage.getItem('jwt') == null){
-        next()
-      }
-      else{
-        next({ path: '/'})
-      }
-    }else {
+      // иначе выдаем ошибку и отправляем на страницу авторизации
+      alert('Ваши правадоступа недостаточны');
+      next('/login')
+    } else {
       next()
     }
   });
