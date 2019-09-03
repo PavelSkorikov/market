@@ -7,6 +7,6 @@ export default async ({ Vue }) => {
   Vue.prototype.$axios = axios;
     let token = sessionStorage.getItem('token');
     if(token) {
-      Vue.prototype.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+      Vue.prototype.$axios.defaults.headers.common['Authorization'] = token;
     }
 }
