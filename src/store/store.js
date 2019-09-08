@@ -35,8 +35,12 @@ export const store = new Vuex.Store({
       state.status = 'success';
       state.user = user
     },
-    auth_error(state){
-      state.status = 'error'
+    auth_error(state, err){
+      state.status = 'error';
+      console.log(err);
+      // если ошибка очищаем хранилище и удаляем токен из заголовка авторизации
+      sessionStorage.clear();
+      delete axios.defaults.headers.common['Authorization'];
     },
     logout(state){
       state.status = '';
@@ -75,14 +79,11 @@ export const store = new Vuex.Store({
             }
             commit('auth_success', res.data);
           }).catch(err => {
-            // если ошибка очищаем хранилище
-            sessionStorage.clear();
+            commit('auth_error', err);
           });
         })
-        .catch(function (err) {
-          commit('auth_error');
-          // если ошибка очищаем хранилище
-          sessionStorage.clear();
+        .catch(err => {
+          commit('auth_error', err);
         })
     },
 
@@ -111,30 +112,49 @@ export const store = new Vuex.Store({
               }
               commit('auth_success', res.data);
             }).catch(err => {
-              // если ошибка очищаем хранилище
-              sessionStorage.clear();
+              commit('auth_error', err);
             });
           })
-          .catch(function (err) {
-            commit('auth_error');
-            // если ошибка очищаем хранилище
-            sessionStorage.clear();
+          .catch(err => {
+            commit('auth_error', err);
           })
     },
 
     //метод выхода пользователя
     logout: ({commit}) => {
-        // отправляем запрос на сервер для удаления refreshtoken
+      // отправляем запрос на сервер для удаления refreshtoken
+      if (sessionStorage.token) {
         const id = jwt_decode(sessionStorage.token).id;
         axios.post(config.auth_url + '/logout', {
           id: id
         });
+      }
         // очищаем состояние Vuex
         commit('logout');
         // очищаем хранилище и удаляем токен из заголовка авторизации axios
         sessionStorage.clear();
         delete axios.defaults.headers.common['Authorization'];
-      }
+    },
+
+    //метод обновления токена в сучае истечения его времени жизни
+    refreshToken: ({commit}) => {
+      axios.post(config.auth_url + '/refresh', {
+        refreshtoken: sessionStorage.refreshtoken
+      })
+        .then(res =>{
+          // сохраняем новые токен и refreshtoken в хранилище sessionStorage
+          const token = 'Bearer ' + res.data.token;
+          sessionStorage.setItem('token', token);
+          sessionStorage.setItem('refreshtoken', res.data.refreshtoken);
+          // сохраняем состояние токена
+          commit('auth_token', token);
+          // записываем полученный токен в заголовок авторизации для всех запросов axios
+          axios.defaults.headers.common['Authorization'] = token;
+        })
+        .catch(err => {
+          commit('auth_error', err);
+        })
+    }
     },
 
   getters: {
